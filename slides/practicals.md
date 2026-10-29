@@ -2,7 +2,7 @@
 
 ----
 
-### Installation
+### 1. Installation
 
 - Install Terraform via package manager (`brew`, `apt`, `dnf`) or version manager (`tfenv` / `mise`):
 
@@ -24,7 +24,7 @@ on darwin_arm64
 
 ----
 
-### Initialization (`init`)
+### 2. Initialization (`init`)
 
 ```bash
 $ terraform init
@@ -44,7 +44,7 @@ Terraform has been successfully initialized!
 
 ----
 
-### Formatting, Validation & Testing (`fmt`, `validate`, `test`)
+### 3. Formatting, Validation & Testing (`fmt`, `validate`, `test`)
 
 - Format `.tf` files, validate schema/types, and run `.tftest.hcl` unit tests before planning:
 
@@ -59,7 +59,7 @@ Success! 3 passed, 0 failed.
 
 ----
 
-### Execution Plan (`plan`)
+### 4. Execution Plan (`plan`)
 
 ```bash
 $ terraform plan -out=plan.out
@@ -81,7 +81,17 @@ Saved the plan to: plan.out
 
 ----
 
-### Applying Changes (`apply`)
+### 5. Inspecting the Saved Plan (`show`)
+
+- Export a machine-readable JSON representation of `plan.out` (used by policy & cost scanners before `apply`):
+
+```bash
+$ terraform show -json plan.out > plan.json
+```
+
+----
+
+### 6. Applying Changes (`apply`)
 
 ```bash
 $ terraform apply plan.out
@@ -94,7 +104,7 @@ Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
 
 ----
 
-### Tearing Down (`destroy`)
+### 7. Tearing Down (`destroy`)
 
 ```bash
 $ terraform destroy
@@ -108,16 +118,6 @@ Terraform will perform the following actions:
 Plan: 0 to add, 0 to change, 8 to destroy.
 ...
 Destroy complete! Resources: 8 destroyed.
-```
-
-----
-
-### Inspecting State (`show`)
-
-- Export a machine-readable JSON representation of the current state or saved plan file:
-
-```bash
-$ terraform show -json plan.out > plan.json
 ```
 
 ----

@@ -23,32 +23,19 @@ $ terraform init -reconfigure  # Reconfigure backend settings
 
 ----
 
-### `terraform plan`
+### `terraform providers`
 
-- Generates a deterministic **execution plan**
-- Compares desired `.tf` configuration against the current state and target cloud APIs to determine which actions (`+ create`, `~ update`, `- destroy`, `-/+ replace`) are needed
-
-----
-
-### Saving & Optimizing Plans
-
-- `terraform plan` is a **dry run** — it never modifies real infrastructure
-- Save the plan to a binary file, detect drift, or speed up large states with `-minimal-refresh`:
+- Displays the tree of providers required by the current configuration and its child modules:
 
 ```bash
-$ terraform plan -out=plan.out          # Save exact plan for apply
-$ terraform plan -refresh-only          # Detect drift without changing resources
-$ terraform plan -minimal-refresh       # Only refresh resources with proposed changes (v1.17+)
-```
+$ terraform providers
 
-----
-
-### `terraform apply`
-
-- Executes the actions proposed in a Terraform plan to create, update, or replace real infrastructure resources
-
-```bash
-$ terraform apply plan.out
+Providers required by configuration:
+.
+├── provider[registry.terraform.io/hashicorp/aws] ~> 6.0
+└── module.my_module
+    ├── provider[registry.terraform.io/hashicorp/aws]
+    └── provider[registry.terraform.io/hashicorp/tls]
 ```
 
 ----
@@ -69,19 +56,55 @@ Success! 1 passed, 0 failed.
 
 ----
 
-### `terraform providers`
+### `terraform plan`
 
-- Displays the tree of providers required by the current configuration and its child modules:
+- Generates a deterministic **execution plan**
+- Compares desired `.tf` configuration against the current state and target cloud APIs to determine which actions (`+ create`, `~ update`, `- destroy`, `-/+ replace`) are needed
+
+----
+
+### Saving & Optimizing Plans
+
+- `terraform plan` is a **dry run** — it never modifies real infrastructure
+- Save the plan to a binary file, detect drift, or speed up large states with `-minimal-refresh`:
 
 ```bash
-$ terraform providers
+$ terraform plan -out=plan.out          # Save exact plan for apply
+$ terraform plan -refresh-only          # Detect drift without changing resources
+$ terraform plan -minimal-refresh       # Only refresh resources with proposed changes (v1.17+)
+```
 
-Providers required by configuration:
-.
-├── provider[registry.terraform.io/hashicorp/aws] ~> 6.0
-└── module.my_module
-    ├── provider[registry.terraform.io/hashicorp/aws]
-    └── provider[registry.terraform.io/hashicorp/tls]
+----
+
+### `terraform graph`
+
+- Outputs a visual dependency graph (in Graphviz `DOT` format) showing how Terraform orders parallel resource operations in its **DAG**:
+
+```bash
+$ terraform graph | dot -Tsvg > graph.svg
+```
+
+![Terraform Dependency Graph](img/terraform-graph.svg)
+
+----
+
+### `terraform apply`
+
+- Executes the actions proposed in a Terraform plan to create, update, or replace real infrastructure resources
+
+```bash
+$ terraform apply plan.out
+```
+
+----
+
+### `terraform console`
+
+- Opens an interactive shell to evaluate HCL expressions, test built-in functions, and inspect live state attributes:
+
+```bash
+$ echo "aws_iam_user.lgu.arn" | terraform console
+"arn:aws:iam::123456789012:user/lgrangeau"
 ```
 
 ----
@@ -99,26 +122,3 @@ $ terraform destroy
 ```bash
 $ terraform plan -destroy
 ```
-
-----
-
-### `terraform console`
-
-- Opens an interactive shell to evaluate HCL expressions, test built-in functions, and inspect resource attributes:
-
-```bash
-$ echo "aws_iam_user.lgu.arn" | terraform console
-"arn:aws:iam::123456789012:user/lgrangeau"
-```
-
-----
-
-### `terraform graph`
-
-- Outputs a visual dependency graph (in Graphviz `DOT` format) showing how Terraform orders parallel resource creation:
-
-```bash
-$ terraform graph | dot -Tsvg > graph.svg
-```
-
-![Terraform Dependency Graph](img/terraform-graph.svg)

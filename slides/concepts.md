@@ -107,138 +107,6 @@ resource "aws_s3_bucket" "lgu_bucket" {
 
 ----
 
-### Scaling Resources: `for_each` vs. `count`
-
-- **Avoid `count` for non-identical resources**: Removing element `[0]` from a list shifts all subsequent indices (`[1] -> [0]`), forcing Terraform to **destroy and recreate** remaining resources!
-- **Prefer `for_each`** (keyed by stable map keys or a `set(string)`):
-
-```hcl
-variable "availability_zones" {
-  type    = map(string)
-  default = { a = "10.0.1.0/24", b = "10.0.2.0/24" }
-}
-
-resource "aws_subnet" "public" {
-  for_each          = var.availability_zones
-  vpc_id            = aws_vpc.main.id
-  availability_zone = "eu-central-1${each.key}"
-  cidr_block        = each.value
-  tags              = { Name = "public-${each.key}" }
-}
-# Address in state: aws_subnet.public["a"], aws_subnet.public["b"]
-```
-
-----
-
-### Resource Lifecycle & Guardrails (`lifecycle`)
-
-- Customize how Terraform creates, updates, and protects critical resources:
-
-```hcl
-resource "aws_instance" "web" {
-  ami           = data.aws_ssm_parameter.al2023_ami.value
-  instance_type = "t4g.micro"
-
-  lifecycle {
-    create_before_destroy = true                  # Zero-downtime replacement
-    prevent_destroy       = true                  # Block accidental deletion
-    ignore_changes        = [tags["LastScanned"]] # Ignore external mutators
-
-    postcondition {
-      condition     = self.public_dns != ""
-      error_message = "Instance must be assigned a public DNS hostname."
-    }
-  }
-}
-```
-
-----
-
-### Continuous Infrastructure Assertions (`check`)
-
-- Unlike `validation` or `postcondition` (which halt execution), `check` blocks verify **live end-to-end health** after `apply` and report warnings on drift:
-
-```hcl
-check "web_health_check" {
-  data "http" "index" {
-    url = "https://${aws_instance.web.public_dns}/healthz"
-  }
-
-  assert {
-    condition     = data.http.index.status_code == 200
-    error_message = "Web server returned HTTP ${data.http.index.status_code}"
-  }
-}
-```
-
-----
-
-### Ephemeral Values & Secrets (`Terraform 1.10+`)
-
-- **Ephemeral variables/resources (`ephemeral = true`)** and **write-only arguments (`_wo`)** prevent sensitive credentials from ever being stored in `terraform.tfstate` or plan files:
-
-```hcl
-ephemeral "aws_secretsmanager_secret_version" "db_password" {
-  secret_id = "prod/rds/master-password"
-}
-
-resource "aws_db_instance" "postgres" {
-  identifier           = "prod-postgres"
-  engine               = "postgres"
-  instance_class       = "db.t4g.micro"
-  username             = "dbadmin"
-  password_wo          = ephemeral.aws_secretsmanager_secret_version.db_password.secret_string
-  password_wo_version  = 1
-}
-```
-
-----
-
-### Modules
-
-- Package and reuse related resources as a **versioned, self-contained component**
-- Improve **organization**, **encapsulation**, and **standardization** across platform teams
-- Accept **input variables** and expose **outputs**:
-
-```hcl
-module "lambda" {
-  source  = "./modules/lambda"
-
-  function_name = "order-processor"
-  s3_bucket     = var.artifacts_bucket_name
-  s3_key        = var.lambda_package_key
-  runtime       = "nodejs22.x"
-  architectures = ["arm64"]
-}
-```
-
-----
-
-### Outputs
-
-- Expose values from a module or root configuration so other resources, modules, or CI/CD pipelines can consume them:
-
-```hcl
-# Inside ./modules/lambda/outputs.tf
-output "invoke_arn" {
-  description = "Invoke ARN of the Lambda function"
-  value       = aws_lambda_function.processor.invoke_arn
-}
-```
-
-```hcl
-# Consuming the module output in root main.tf
-resource "aws_api_gateway_authorizer" "custom_authorizer" {
-  name                             = "CustomAuthorizer"
-  rest_api_id                      = aws_api_gateway_rest_api.main.id
-  authorizer_uri                   = module.lambda.invoke_arn
-  identity_validation_expression   = "^Bearer [-0-9a-zA-Z\\._]*$"
-  authorizer_result_ttl_in_seconds = 30
-}
-```
-
-----
-
 ### Data Sources
 
 - Query and read **existing resources**, dynamic AMI IDs, or external metadata
@@ -279,36 +147,69 @@ resource "aws_instance" "frontend" {
 
 ----
 
-### Config-Driven Import & Refactoring
+### Outputs
 
-- Bring existing cloud resources under Terraform management and generate HCL automatically (`terraform plan -generate-config-out=generated.tf`)
-- Use declarative `import`, `moved`, and `removed` blocks instead of manual state surgery:
+- Expose values from a module or root configuration so other resources, modules, or CI/CD pipelines can consume them:
 
 ```hcl
-import {
-  to = aws_instance.frontend
-  id = "i-0abcd1234efgh5678"
+# Inside ./modules/lambda/outputs.tf
+output "invoke_arn" {
+  description = "Invoke ARN of the Lambda function"
+  value       = aws_lambda_function.processor.invoke_arn
 }
+```
 
-moved {
-  from = aws_instance.old_name
-  to   = aws_instance.frontend
+```hcl
+# Consuming the module output in root main.tf
+resource "aws_api_gateway_authorizer" "custom_authorizer" {
+  name                             = "CustomAuthorizer"
+  rest_api_id                      = aws_api_gateway_rest_api.main.id
+  authorizer_uri                   = module.lambda.invoke_arn
+  identity_validation_expression   = "^Bearer [-0-9a-zA-Z\\._]*$"
+  authorizer_result_ttl_in_seconds = 30
 }
 ```
 
 ----
 
-### Provisioners (Legacy / Last Resort)
+### Scaling Resources: `for_each` vs. `count`
 
-- Execute scripts (`local-exec`, `remote-exec`) or copy files (`file`) during creation/destruction
-- **Discouraged by HashiCorp** — Terraform cannot track imperative changes made by provisioners
-- Prefer immutable images (**Packer**), `user_data` / `cloud-init`, or **SSM / Ansible**:
+- **Avoid `count` for non-identical resources**: Removing element `[0]` from a list shifts all subsequent indices (`[1] -> [0]`), forcing Terraform to **destroy and recreate** remaining resources!
+- **Prefer `for_each`** (keyed by stable map keys or a `set(string)`):
 
 ```hcl
-resource "aws_instance" "web" {
-  ami           = data.aws_ssm_parameter.al2023_ami.value
-  instance_type = "t4g.micro"
-  user_data     = file("${path.module}/cloud-init.yaml")
+variable "availability_zones" {
+  type    = map(string)
+  default = { a = "10.0.1.0/24", b = "10.0.2.0/24" }
+}
+
+resource "aws_subnet" "public" {
+  for_each          = var.availability_zones
+  vpc_id            = aws_vpc.main.id
+  availability_zone = "eu-central-1${each.key}"
+  cidr_block        = each.value
+  tags              = { Name = "public-${each.key}" }
+}
+# Address in state: aws_subnet.public["a"], aws_subnet.public["b"]
+```
+
+----
+
+### Modules
+
+- Package and reuse related resources as a **versioned, self-contained component**
+- Improve **organization**, **encapsulation**, and **standardization** across platform teams
+- Accept **input variables** and expose **outputs**:
+
+```hcl
+module "lambda" {
+  source  = "./modules/lambda"
+
+  function_name = "order-processor"
+  s3_bucket     = var.artifacts_bucket_name
+  s3_key        = var.lambda_package_key
+  runtime       = "nodejs22.x"
+  architectures = ["arm64"]
 }
 ```
 
@@ -337,6 +238,28 @@ terraform {
     encrypt      = true
     use_lockfile = true
   }
+}
+```
+
+----
+
+### Ephemeral Values & Secrets (`Terraform 1.10+`)
+
+- Because standard resource attributes are saved in `terraform.tfstate`, sensitive values require special handling
+- **Ephemeral resources (`ephemeral`)** and **write-only arguments (`_wo`)** ensure secrets are **never stored** in state or plan files:
+
+```hcl
+ephemeral "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = "prod/rds/master-password"
+}
+
+resource "aws_db_instance" "postgres" {
+  identifier           = "prod-postgres"
+  engine               = "postgres"
+  instance_class       = "db.t4g.micro"
+  username             = "dbadmin"
+  password_wo          = ephemeral.aws_secretsmanager_secret_version.db_password.secret_string
+  password_wo_version  = 1
 }
 ```
 
@@ -377,3 +300,81 @@ bucket = terraform.workspace == "preprod" ? var.bucket_demo_preprod : var.bucket
     - `01-network/terraform.tfstate` (`VPC`, `Subnets`, `NAT` — changes rarely)
     - `02-data/terraform.tfstate` (`RDS`, `S3`, `KMS` — stateful, strict `prevent_destroy`)
     - `03-compute/terraform.tfstate` (`EKS`, `Lambda`, `ECS` — changes daily)
+
+----
+
+### Resource Lifecycle & Guardrails (`lifecycle`)
+
+- Customize how Terraform creates, updates, and protects critical resources:
+
+```hcl
+resource "aws_instance" "web" {
+  ami           = data.aws_ssm_parameter.al2023_ami.value
+  instance_type = "t4g.micro"
+
+  lifecycle {
+    create_before_destroy = true                  # Zero-downtime replacement
+    prevent_destroy       = true                  # Block accidental deletion
+    ignore_changes        = [tags["LastScanned"]] # Ignore external mutators
+
+    postcondition {
+      condition     = self.public_dns != ""
+      error_message = "Instance must be assigned a public DNS hostname."
+    }
+  }
+}
+```
+
+----
+
+### Config-Driven Import & Refactoring
+
+- Bring existing cloud resources under Terraform management and generate HCL automatically (`terraform plan -generate-config-out=generated.tf`)
+- Use declarative `import`, `moved`, and `removed` blocks to refactor state addresses without destroying infrastructure:
+
+```hcl
+import {
+  to = aws_instance.frontend
+  id = "i-0abcd1234efgh5678"
+}
+
+moved {
+  from = aws_instance.old_name
+  to   = aws_instance.frontend
+}
+```
+
+----
+
+### Continuous Infrastructure Assertions (`check`)
+
+- Unlike `validation` or `postcondition` (which halt execution), `check` blocks verify **live end-to-end health** after `apply` and report warnings on drift:
+
+```hcl
+check "web_health_check" {
+  data "http" "index" {
+    url = "https://${aws_instance.web.public_dns}/healthz"
+  }
+
+  assert {
+    condition     = data.http.index.status_code == 200
+    error_message = "Web server returned HTTP ${data.http.index.status_code}"
+  }
+}
+```
+
+----
+
+### Provisioners (Legacy / Last Resort)
+
+- Execute scripts (`local-exec`, `remote-exec`) or copy files (`file`) during creation/destruction
+- **Discouraged by HashiCorp** — Terraform cannot track imperative changes made by provisioners
+- Prefer immutable images (**Packer**), `user_data` / `cloud-init`, or **SSM / Ansible**:
+
+```hcl
+resource "aws_instance" "web" {
+  ami           = data.aws_ssm_parameter.al2023_ami.value
+  instance_type = "t4g.micro"
+  user_data     = file("${path.module}/cloud-init.yaml")
+}
+```
