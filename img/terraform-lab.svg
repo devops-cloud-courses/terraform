@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="labHdr" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="labVpc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="labS3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <marker id="labArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#475569"/>
+    </marker>
+    <filter id="labShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="960" height="360" rx="16" fill="#f8fafc"/>
+
+  <!-- Left Box: Developer / Terraform CLI -->
+  <g filter="url(#labShadow)">
+    <rect x="22" y="24" width="236" height="312" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <rect x="22" y="24" width="236" height="44" rx="14" fill="url(#labHdr)"/>
+    <text x="140" y="51" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">Terraform Root Module</text>
+
+    <rect x="38" y="84" width="204" height="72" rx="10" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text x="140" y="106" text-anchor="middle" font-size="12" font-weight="800" fill="#1e293b">1. State &amp; Lockfile</text>
+    <text x="140" y="126" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#2563eb">backend "s3" {</text>
+    <text x="140" y="143" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#059669">  use_lockfile = true }</text>
+
+    <rect x="38" y="168" width="204" height="76" rx="10" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="140" y="190" text-anchor="middle" font-size="12" font-weight="800" fill="#1e40af">2. Reusable Modules</text>
+    <text x="140" y="210" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#1d4ed8">module "network" { ... }</text>
+    <text x="140" y="228" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#1d4ed8">module "compute" { ... }</text>
+
+    <rect x="38" y="256" width="204" height="64" rx="10" fill="#ecfdf5" stroke="#a7f3d0"/>
+    <text x="140" y="278" text-anchor="middle" font-size="12" font-weight="800" fill="#065f46">3. Validation &amp; Tests</text>
+    <text x="140" y="298" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#047857">terraform test &amp; check{}</text>
+  </g>
+
+  <line x1="264" y1="180" x2="296" y2="180" stroke="#475569" stroke-width="2.5" marker-end="url(#labArrow)"/>
+
+  <!-- Right Box: Target AWS / LocalStack Cloud Topology -->
+  <g filter="url(#labShadow)">
+    <rect x="304" y="24" width="634" height="312" rx="14" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+    <rect x="304" y="24" width="634" height="44" rx="14" fill="url(#labVpc)"/>
+    <text x="621" y="51" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">AWS Region (eu-central-1) or LocalStack Emulator</text>
+
+    <!-- VPC Container -->
+    <rect x="322" y="82" width="400" height="238" rx="12" fill="#f8fafc" stroke="#60a5fa" stroke-width="2" stroke-dasharray="6,4"/>
+    <text x="522" y="104" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1e40af">aws_vpc.main (10.0.0.0/16) — Dynamic Subnets via for_each</text>
+
+    <!-- AZ-a Subnet -->
+    <rect x="338" y="116" width="176" height="188" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+    <text x="426" y="138" text-anchor="middle" font-size="11.5" font-weight="800" fill="#1d4ed8">AZ: eu-central-1a</text>
+    <text x="426" y="155" text-anchor="middle" font-size="10" font-family="'JetBrains Mono', monospace" fill="#475569">aws_subnet.public["a"]</text>
+    <rect x="352" y="168" width="148" height="68" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="426" y="190" text-anchor="middle" font-size="11" font-weight="800" fill="#0f172a">aws_instance["a"]</text>
+    <text x="426" y="207" text-anchor="middle" font-size="10" font-family="'JetBrains Mono', monospace" fill="#2563eb">t4g.micro (AL2023)</text>
+    <text x="426" y="224" text-anchor="middle" font-size="9.5" fill="#059669">data.aws_ssm_parameter</text>
+    <rect x="352" y="246" width="148" height="44" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+    <text x="426" y="266" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">aws_security_group</text>
+    <text x="426" y="281" text-anchor="middle" font-size="9.5" font-family="'JetBrains Mono', monospace" fill="#b45309">Ingress: 80 / 443</text>
+
+    <!-- AZ-b Subnet -->
+    <rect x="530" y="116" width="176" height="188" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+    <text x="618" y="138" text-anchor="middle" font-size="11.5" font-weight="800" fill="#1d4ed8">AZ: eu-central-1b</text>
+    <text x="618" y="155" text-anchor="middle" font-size="10" font-family="'JetBrains Mono', monospace" fill="#475569">aws_subnet.public["b"]</text>
+    <rect x="544" y="168" width="148" height="68" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="618" y="190" text-anchor="middle" font-size="11" font-weight="800" fill="#0f172a">aws_instance["b"]</text>
+    <text x="618" y="207" text-anchor="middle" font-size="10" font-family="'JetBrains Mono', monospace" fill="#2563eb">t4g.micro (AL2023)</text>
+    <text x="618" y="224" text-anchor="middle" font-size="9.5" fill="#059669">data.aws_ssm_parameter</text>
+    <rect x="544" y="246" width="148" height="44" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+    <text x="618" y="266" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">lifecycle block</text>
+    <text x="618" y="281" text-anchor="middle" font-size="9.5" font-family="'JetBrains Mono', monospace" fill="#b45309">create_before_destroy</text>
+
+    <!-- Right Column: S3 & IAM -->
+    <rect x="738" y="82" width="182" height="112" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+    <text x="829" y="106" text-anchor="middle" font-size="12" font-weight="800" fill="#065f46">Object Storage</text>
+    <text x="829" y="126" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#047857">aws_s3_bucket.assets</text>
+    <text x="829" y="145" text-anchor="middle" font-size="10" fill="#059669">+ versioning: Enabled</text>
+    <text x="829" y="162" text-anchor="middle" font-size="10" fill="#059669">+ SSE-S3 encryption</text>
+    <text x="829" y="179" text-anchor="middle" font-size="10" font-family="'JetBrains Mono', monospace" fill="#065f46">prevent_destroy = true</text>
+
+    <rect x="738" y="208" width="182" height="112" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+    <text x="829" y="232" text-anchor="middle" font-size="12" font-weight="800" fill="#5b21b6">Outputs &amp; Assertions</text>
+    <text x="829" y="253" text-anchor="middle" font-size="10" font-family="'JetBrains Mono', monospace" fill="#6d28d9">output "instance_ips"</text>
+    <text x="829" y="271" text-anchor="middle" font-size="10" font-family="'JetBrains Mono', monospace" fill="#6d28d9">output "bucket_arn"</text>
+    <text x="829" y="293" text-anchor="middle" font-size="10" font-weight="700" fill="#4c1d95">check "http_200" { ... }</text>
+  </g>
+</svg>

@@ -107,6 +107,72 @@ resource "aws_s3_bucket" "lgu_bucket" {
 
 ----
 
+### Scaling Resources: `for_each` vs. `count`
+
+- **Avoid `count` for non-identical resources**: Removing element `[0]` from a list shifts all subsequent indices (`[1] -> [0]`), forcing Terraform to **destroy and recreate** remaining resources!
+- **Prefer `for_each`** (keyed by stable map keys or a `set(string)`):
+
+```hcl
+variable "availability_zones" {
+  type    = map(string)
+  default = { a = "10.0.1.0/24", b = "10.0.2.0/24" }
+}
+
+resource "aws_subnet" "public" {
+  for_each          = var.availability_zones
+  vpc_id            = aws_vpc.main.id
+  availability_zone = "eu-central-1${each.key}"
+  cidr_block        = each.value
+  tags              = { Name = "public-${each.key}" }
+}
+# Address in state: aws_subnet.public["a"], aws_subnet.public["b"]
+```
+
+----
+
+### Resource Lifecycle & Guardrails (`lifecycle`)
+
+- Customize how Terraform creates, updates, and protects critical resources:
+
+```hcl
+resource "aws_instance" "web" {
+  ami           = data.aws_ssm_parameter.al2023_ami.value
+  instance_type = "t4g.micro"
+
+  lifecycle {
+    create_before_destroy = true                  # Zero-downtime replacement
+    prevent_destroy       = true                  # Block accidental deletion
+    ignore_changes        = [tags["LastScanned"]] # Ignore external mutators
+
+    postcondition {
+      condition     = self.public_dns != ""
+      error_message = "Instance must be assigned a public DNS hostname."
+    }
+  }
+}
+```
+
+----
+
+### Continuous Infrastructure Assertions (`check`)
+
+- Unlike `validation` or `postcondition` (which halt execution), `check` blocks verify **live end-to-end health** after `apply` and report warnings on drift:
+
+```hcl
+check "web_health_check" {
+  data "http" "index" {
+    url = "https://${aws_instance.web.public_dns}/healthz"
+  }
+
+  assert {
+    condition     = data.http.index.status_code == 200
+    error_message = "Web server returned HTTP ${data.http.index.status_code}"
+  }
+}
+```
+
+----
+
 ### Ephemeral Values & Secrets (`Terraform 1.10+`)
 
 - **Ephemeral variables/resources (`ephemeral = true`)** and **write-only arguments (`_wo`)** prevent sensitive credentials from ever being stored in `terraform.tfstate` or plan files:
@@ -298,3 +364,16 @@ $ terraform workspace list
 ```hcl
 bucket = terraform.workspace == "preprod" ? var.bucket_demo_preprod : var.bucket_demo
 ```
+
+----
+
+### Production State Architecture & Blast Radius
+
+- **Why CLI Workspaces alone aren't enough for Production**:
+  - All CLI workspaces share the same state backend bucket/credentials and code branch — a human running `destroy` in the wrong workspace can wipe production
+- **Production Best Practices**:
+  - **Directory-per-Environment** (`envs/dev/`, `envs/prod/` or **Terragrunt**) with separate AWS accounts & IAM roles
+  - **Layered State (Minimize Blast Radius)**: Split monolithic states by change frequency and ownership:
+    - `01-network/terraform.tfstate` (`VPC`, `Subnets`, `NAT` — changes rarely)
+    - `02-data/terraform.tfstate` (`RDS`, `S3`, `KMS` — stateful, strict `prevent_destroy`)
+    - `03-compute/terraform.tfstate` (`EKS`, `Lambda`, `ECS` — changes daily)

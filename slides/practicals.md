@@ -119,3 +119,50 @@ Destroy complete! Resources: 8 destroyed.
 ```bash
 $ terraform show -json plan.out > plan.json
 ```
+
+----
+
+### Production GitOps, DevSecOps & FinOps Pipeline
+
+- In production, **nobody runs `terraform apply` from a laptop** — changes flow through Pull Requests with automated security, policy, and cost gates:
+
+![Terraform GitOps Pipeline](img/terraform-gitops.svg)
+
+----
+
+### Shift-Left Security (`Trivy` / `OPA`) & FinOps (`Infracost`)
+
+- Scan `.tf` files and `plan.json` in CI/CD before allowing any merge to `main`:
+
+```bash
+# 1. Linting & provider-aware rules
+$ tflint --recursive
+
+# 2. Security & misconfiguration scan (e.g., public S3 buckets, open 0.0.0.0/0 SSH)
+$ trivy config .
+
+# 3. Policy as Code evaluation (Open Policy Agent / Rego against plan.json)
+$ opa exec --decision terraform/analysis/authz --bundle policy/ plan.json
+
+# 4. FinOps cloud cost diff posted directly on the Pull Request
+$ infracost diff --path=plan.json
+# Monthly cost change: +$42.10 (+12%)
+```
+
+----
+
+### MSc Capstone Lab: Multi-AZ Cloud Architecture
+
+- Build, test, and validate a modular AWS topology (using your **AWS Sandbox Account** or locally for free via **LocalStack** + `tflocal`):
+
+![MSc Terraform Lab Architecture](img/terraform-lab.svg)
+
+----
+
+### MSc Lab Requirements & Acceptance Criteria
+
+1. **State & Providers**: Configure `terraform >= 1.17.0`, `hashicorp/aws ~> 6.0`, and an S3 backend with `use_lockfile = true`
+2. **Dynamic Networking (`for_each`)**: Create a VPC (`10.0.0.0/16`) and provision 2 public subnets across `eu-central-1a` and `eu-central-1b` using `for_each` (no `count`!)
+3. **Compute & Data Sources**: Lookup the latest **Amazon Linux 2023 ARM64 AMI** dynamically via `data "aws_ssm_parameter"` and deploy `t4g.micro` instances with `create_before_destroy = true`
+4. **Secure Storage**: Create an `aws_s3_bucket` with `aws_s3_bucket_versioning` enabled and a variable `validation` rule enforcing lowercase naming
+5. **Verification**: Add a `check` block or `tests/main.tftest.hcl` unit test suite and pass `terraform fmt -check`, `terraform validate`, and `terraform test`

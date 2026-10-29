@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="goStep1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="goStep2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+    <linearGradient id="goStep3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="goStep4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <marker id="goArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#64748b"/>
+    </marker>
+    <filter id="goShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="960" height="360" rx="16" fill="#f8fafc"/>
+
+  <!-- Stage 1: Git PR & OIDC -->
+  <g filter="url(#goShadow)">
+    <rect x="20" y="24" width="208" height="240" rx="14" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+    <rect x="20" y="24" width="208" height="44" rx="14" fill="url(#goStep1)"/>
+    <text x="124" y="51" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">1. Pull Request</text>
+
+    <rect x="34" y="84" width="180" height="72" rx="10" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="124" y="108" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1e40af">Git Branch Push</text>
+    <text x="124" y="128" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" fill="#1d4ed8">feat/eks-nodegroup</text>
+    <text x="124" y="146" text-anchor="middle" font-size="10.5" fill="#475569">GitHub Actions / GitLab CI</text>
+
+    <rect x="34" y="170" width="180" height="76" rx="10" fill="#0f172a"/>
+    <text x="124" y="193" text-anchor="middle" font-size="11.5" font-weight="700" fill="#38bdf8">Keyless OIDC Auth</text>
+    <text x="124" y="213" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#e2e8f0">AssumeRoleWithWebIdentity</text>
+    <text x="124" y="232" text-anchor="middle" font-size="10.5" fill="#94a3b8">Zero static cloud secrets</text>
+  </g>
+
+  <line x1="232" y1="144" x2="252" y2="144" stroke="#64748b" stroke-width="2.5" marker-end="url(#goArrow)"/>
+
+  <!-- Stage 2: Shift-Left Quality, Sec & FinOps -->
+  <g filter="url(#goShadow)">
+    <rect x="258" y="24" width="212" height="240" rx="14" fill="#ffffff" stroke="#ddd6fe" stroke-width="2"/>
+    <rect x="258" y="24" width="212" height="44" rx="14" fill="url(#goStep2)"/>
+    <text x="364" y="51" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">2. Shift-Left Checks</text>
+
+    <rect x="272" y="82" width="184" height="50" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+    <text x="364" y="102" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5b21b6">Syntax &amp; Unit Tests</text>
+    <text x="364" y="121" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#6d28d9">fmt · validate · tflint · test</text>
+
+    <rect x="272" y="140" width="184" height="52" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+    <text x="364" y="160" text-anchor="middle" font-size="11.5" font-weight="800" fill="#b91c1c">DevSecOps &amp; Policy</text>
+    <text x="364" y="179" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#dc2626">trivy · checkov · OPA Rego</text>
+
+    <rect x="272" y="200" width="184" height="50" rx="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+    <text x="364" y="220" text-anchor="middle" font-size="11.5" font-weight="800" fill="#047857">FinOps Cloud Cost Diff</text>
+    <text x="364" y="239" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#059669">infracost (+$42/mo diff)</text>
+  </g>
+
+  <line x1="474" y1="144" x2="494" y2="144" stroke="#64748b" stroke-width="2.5" marker-end="url(#goArrow)"/>
+
+  <!-- Stage 3: PR Plan Review -->
+  <g filter="url(#goShadow)">
+    <rect x="500" y="24" width="208" height="240" rx="14" fill="#ffffff" stroke="#fde68a" stroke-width="2"/>
+    <rect x="500" y="24" width="208" height="44" rx="14" fill="url(#goStep3)"/>
+    <text x="604" y="51" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">3. Speculative Plan</text>
+
+    <rect x="514" y="84" width="180" height="84" rx="10" fill="#fffbeb" stroke="#fde68a"/>
+    <text x="604" y="106" text-anchor="middle" font-size="12" font-weight="800" fill="#92400e">PR Comment Output</text>
+    <text x="528" y="128" font-size="10.5" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#16a34a">+ 3 to add</text>
+    <text x="528" y="145" font-size="10.5" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#d97706">~ 1 to change</text>
+    <text x="528" y="161" font-size="10.5" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#dc2626">- 0 to destroy</text>
+
+    <rect x="514" y="180" width="180" height="68" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="604" y="204" text-anchor="middle" font-size="12" font-weight="800" fill="#1e293b">Human Approval Gate</text>
+    <text x="604" y="223" text-anchor="middle" font-size="10.5" fill="#475569">Platform Team Reviews</text>
+    <text x="604" y="239" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">Plan + Cost + Blast Radius</text>
+  </g>
+
+  <line x1="712" y1="144" x2="732" y2="144" stroke="#64748b" stroke-width="2.5" marker-end="url(#goArrow)"/>
+
+  <!-- Stage 4: Merge & Automated Apply -->
+  <g filter="url(#goShadow)">
+    <rect x="738" y="24" width="202" height="240" rx="14" fill="#ffffff" stroke="#a7f3d0" stroke-width="2"/>
+    <rect x="738" y="24" width="202" height="44" rx="14" fill="url(#goStep4)"/>
+    <text x="839" y="51" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">4. Merge &amp; Apply</text>
+
+    <rect x="752" y="84" width="174" height="78" rx="10" fill="#ecfdf5" stroke="#6ee7b7"/>
+    <text x="839" y="108" text-anchor="middle" font-size="12" font-weight="800" fill="#065f46">Merge to main</text>
+    <text x="839" y="128" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#047857">terraform apply plan.out</text>
+    <text x="839" y="148" text-anchor="middle" font-size="10.5" fill="#059669">Acquires S3 .tflock</text>
+
+    <rect x="752" y="174" width="174" height="74" rx="10" fill="#0f172a"/>
+    <text x="839" y="198" text-anchor="middle" font-size="11.5" font-weight="700" fill="#34d399">Post-Deploy Checks</text>
+    <text x="839" y="218" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#e2e8f0">check "health" { ... }</text>
+    <text x="839" y="236" text-anchor="middle" font-size="10.5" fill="#94a3b8">Scheduled Drift Detection</text>
+  </g>
+
+  <!-- Bottom Orchestrators Bar -->
+  <g filter="url(#goShadow)">
+    <rect x="20" y="284" width="920" height="54" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <rect x="36" y="295" width="210" height="32" rx="8" fill="#1e293b"/>
+    <text x="141" y="316" text-anchor="middle" font-size="11.5" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#ffffff">GITOPS ORCHESTRATORS</text>
+    <text x="270" y="316" font-size="12.5" font-weight="700" fill="#1e40af">Atlantis / Digger</text>
+    <text x="392" y="316" font-size="12.5" fill="#64748b">·</text>
+    <text x="408" y="316" font-size="12.5" font-weight="700" fill="#4f46e5">HCP Terraform / Spacelift / Env0</text>
+    <text x="642" y="316" font-size="12.5" fill="#64748b">·</text>
+    <text x="658" y="316" font-size="12.5" font-weight="700" fill="#047857">GitHub Actions / GitLab CI</text>
+  </g>
+</svg>
