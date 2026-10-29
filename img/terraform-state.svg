@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 350" width="920" height="350" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="stateGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <marker id="arrowBi" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb"/>
+    </marker>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="920" height="350" rx="16" fill="#f8fafc"/>
+
+  <!-- Left: Desired State -->
+  <g filter="url(#cardShadow)">
+    <rect x="35" y="65" width="235" height="220" rx="16" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+    <rect x="55" y="88" width="195" height="36" rx="8" fill="#eff6ff"/>
+    <text x="152" y="111" text-anchor="middle" font-size="14" font-weight="800" fill="#1d4ed8">Desired State</text>
+    <text x="152" y="148" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#0f172a">main.tf</text>
+    <text x="152" y="176" text-anchor="middle" font-size="12" fill="#475569">Declared in Git repo</text>
+    <rect x="55" y="196" width="195" height="66" rx="8" fill="#0f172a"/>
+    <text x="70" y="220" font-size="11" font-family="'JetBrains Mono', monospace" fill="#93c5fd">instance_type = "t3.micro"</text>
+    <text x="70" y="242" font-size="11" font-family="'JetBrains Mono', monospace" fill="#a7f3d0">count         = 2</text>
+  </g>
+
+  <!-- Arrow Left <-> Center -->
+  <line x1="278" y1="175" x2="332" y2="175" stroke="#2563eb" stroke-width="3" marker-start="url(#arrowBi)" marker-end="url(#arrowBi)"/>
+  <text x="305" y="158" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#2563eb">Diff</text>
+
+  <!-- Center: Terraform State -->
+  <g filter="url(#cardShadow)">
+    <rect x="342" y="42" width="236" height="266" rx="18" fill="#ffffff" stroke="#4f46e5" stroke-width="2.5"/>
+    <rect x="362" y="64" width="196" height="44" rx="10" fill="url(#stateGrad)"/>
+    <text x="460" y="92" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">Terraform State</text>
+
+    <text x="460" y="134" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#3730a3">terraform.tfstate</text>
+    <text x="460" y="158" text-anchor="middle" font-size="12" fill="#475569">Maps HCL resources to</text>
+    <text x="460" y="176" text-anchor="middle" font-size="12" fill="#475569">real-world provider IDs</text>
+
+    <rect x="364" y="194" width="192" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe"/>
+    <text x="460" y="216" text-anchor="middle" font-size="12" font-weight="700" fill="#312e81">Remote Backend</text>
+    <text x="460" y="236" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" fill="#4338ca">S3 / GCS / Azure Blob</text>
+    <text x="460" y="256" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" fill="#059669">+ State Locking &amp; Encryption</text>
+  </g>
+
+  <!-- Arrow Center <-> Right -->
+  <line x1="586" y1="175" x2="640" y2="175" stroke="#2563eb" stroke-width="3" marker-start="url(#arrowBi)" marker-end="url(#arrowBi)"/>
+  <text x="613" y="158" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#2563eb">Sync</text>
+
+  <!-- Right: Actual Cloud Infrastructure -->
+  <g filter="url(#cardShadow)">
+    <rect x="650" y="65" width="235" height="220" rx="16" fill="#ffffff" stroke="#a7f3d0" stroke-width="2"/>
+    <rect x="670" y="88" width="195" height="36" rx="8" fill="#ecfdf5"/>
+    <text x="767" y="111" text-anchor="middle" font-size="14" font-weight="800" fill="#047857">Real Infrastructure</text>
+    <text x="767" y="148" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#0f172a">Cloud Provider</text>
+    <text x="767" y="176" text-anchor="middle" font-size="12" fill="#475569">Live running resources</text>
+
+    <rect x="670" y="196" width="195" height="66" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="686" y="220" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="600" fill="#059669">i-0a1b2c3d4e (t3.micro)</text>
+    <text x="686" y="242" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="600" fill="#059669">i-0f9e8d7c6b (t3.micro)</text>
+  </g>
+</svg>

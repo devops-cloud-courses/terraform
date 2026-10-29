@@ -1,23 +1,29 @@
-## Mise en pratique
+## Hands-on Practice
 
 ----
 
 ### Installation
 
+- Install Terraform via package manager (`brew`, `apt`, `yum`) or official binary release:
+
 ```bash
-$ curl -O https://releases.hashicorp.com/terraform/0.13.3/terraform_0.13.3_linux_amd64.zip
-$ sudo unzip terraform_0.13.3_linux_amd64.zip /usr/local/bin
-$ rm terraform_0.13.3_linux_amd64.zip
+# macOS / Linux (Homebrew)
+$ brew tap hashicorp/tap
+$ brew install hashicorp/tap/terraform
+
+# Or direct Linux binary
+$ curl -fsSLO https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+$ sudo unzip terraform_1.9.8_linux_amd64.zip -d /usr/local/bin
 ```
 
 ```bash
 $ terraform --version
- Terraform v0.13.3
+Terraform v1.9.8
 ```
 
 ----
 
-### Initialisation
+### Initialization (`init`)
 
 ```bash
 $ terraform init
@@ -25,54 +31,75 @@ $ terraform init
 Initializing the backend...
 
 Initializing provider plugins...
-- Finding latest version of hashicorp/aws...
-- Installing hashicorp/aws v3.8.0...
-- Installed hashicorp/aws v3.8.0 (signed by HashiCorp)
+- Finding hashicorp/aws versions matching "~> 5.0"...
+- Installing hashicorp/aws v5.70.0...
+- Installed hashicorp/aws v5.70.0 (signed by HashiCorp)
+
+Terraform has been successfully initialized!
 ```
 
 ----
 
-### Plan
+### Formatting & Validation (`fmt` & `validate`)
+
+- Automatically format `.tf` files to canonical style and validate syntax before planning:
+
+```bash
+$ terraform fmt -recursive
+$ terraform validate
+Success! The configuration is valid.
+```
+
+----
+
+### Execution Plan (`plan`)
 
 ```bash
 $ terraform plan
-Refreshing Terraform state in-memory prior to plan...
-The refreshed state will be used to calculate this plan, but will not be
-persisted to local or remote state storage.
 
-An execution plan has been generated and is shown below.
+Terraform used the selected providers to generate the following execution plan.
 Resource actions are indicated with the following symbols:
   + create
 
 Terraform will perform the following actions:
+  # aws_s3_bucket.lgu_bucket will be created
+  + resource "aws_s3_bucket" "lgu_bucket" {
+      + bucket = "lgu-bucket"
+      + id     = (known after apply)
+    }
 ...
 Plan: 8 to add, 0 to change, 0 to destroy.
 ```
 
 ----
 
-### Apply
+### Applying Changes (`apply`)
 
 ```bash
 $ terraform apply
-An execution plan has been generated and is shown below.
+
+Terraform used the selected providers to generate the following execution plan.
 Resource actions are indicated with the following symbols:
   + create
 
 Terraform will perform the following actions:
 ...
 Plan: 8 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Enter a value: yes
 ...
 Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
 ```
 
 ----
 
-### Destroy
+### Tearing Down (`destroy`)
 
 ```bash
 $ terraform destroy
-An execution plan has been generated and is shown below.
+
+Terraform used the selected providers to generate the following execution plan.
 Resource actions are indicated with the following symbols:
   - destroy
 
@@ -85,19 +112,9 @@ Destroy complete! Resources: 8 destroyed.
 
 ----
 
-### Format
+### Inspecting State (`show`)
 
-Mise en forme du code, pour plus de lisibilité
-
-```bash
-$ terraform fmt
-```
-
-----
-
-### Show
-
-Génération d'un JSON représentant l'état de Terraform
+- Export a machine-readable JSON representation of the current state or saved plan file (ideal for policy checks like `OPA` / `Checkov`):
 
 ```bash
 $ terraform show -json

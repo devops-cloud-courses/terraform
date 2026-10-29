@@ -2,130 +2,143 @@
 
 ----
 
-### HCL (Hashicorp Configuration Language)
+### HCL (HashiCorp Configuration Language)
 
-Langage *"human-readable"* proche du JSON
-
-Décrit les ressource utilisées dans Terraform
-
-----
-
-### Providers
-
-Responsable du cycle de vie de la ressource
-
-Basé sur le CRUD (*Create/Read/Update/Delete*)
-
-Plus de 1375 providers existants :
-- AWS, GCP, Azure, ...
-- Heroku, OVH, 1&1, ...
-- Consul, Chef, Vault, ...
-- Docker, Kubernetes, ...
-- Gitlab, Github, ...
-- MySQL, PostgreSQL, ...
+- **Human-readable** declarative configuration language (also compatible with JSON)
+- Expresses **desired target state** rather than imperative step-by-step scripts
+- Supports expressions, type constraints, built-in functions (`cidrsubnet`, `jsonencode`, `try`), and dynamic blocks (`for_each`, `count`)
 
 ----
 
 ### Providers
 
-![Image](https://aurelie-vache.developpez.com/tutoriels/cloud/terraform-gerer-infrastructure-code/images/image-4.png)
+- Responsible for understanding API interactions and managing a resource's **lifecycle**
+- Built on **CRUD** operations (*Create / Read / Update / Delete*)
+- Over **4,000+ providers** available on the **Terraform Registry**:
+  - **Public Clouds**: `AWS`, `GCP`, `Azure`, `OVH`, `DigitalOcean`, `Scaleway`
+  - **Platform & Containers**: `Kubernetes`, `Helm`, `Docker`, `Nomad`
+  - **HashiCorp Stack**: `Vault`, `Consul`, `Boundary`
+  - **DevOps & SaaS**: `GitHub`, `GitLab`, `Datadog`, `Cloudflare`, `PostgreSQL`
 
 ----
 
-### Providers
+### Providers Architecture
 
-Premier fichier .tf à mettre dans votre projet
+![Terraform Providers Architecture](img/terraform-providers.svg)
 
-```json
+----
+
+### Configuring Providers
+
+- Declare required provider versions and regional settings in `providers.tf` or `versions.tf`:
+
+```hcl
+terraform {
+  required_version = ">= 1.9.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 provider "aws" {
   region = "eu-central-1"
 }
 ```
 
-Attention aux données sensibles à ne pas commiter dans le fichier
+----
 
-Externaliser les AK/SK
+### Provider Authentication
+
+- **Never commit sensitive credentials** (`Access Keys`, `Secrets`, `Tokens`) in `.tf` files
+- Use short-lived credentials (`OIDC`, `IAM Roles`, `Workload Identity`) or environment variables:
 
 ```bash
-export AWS_ACCESS_KEY=YOUR_ACCESS_KEY
-export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
-export AWS_DEFAULT_REGION=eu-central-1
+export AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY"
+export AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY"
+export AWS_DEFAULT_REGION="eu-central-1"
 ```
 
 ----
 
 ### Provisioners
 
-Permet de modifier le contenu d'une ressource distante
-
-A n'utiliser qu'en dernier recours. D'autres outils peuvent être utilisés, notamment Packer
-
-----
-
-### Provisioners
-
-Plusieurs types de provisioners
-- File
-- Local-exec
-- Remote-exec
-- Chef
-- Habitat
-- Puppet
-- Salt
+- Execute scripts or copy files onto a local or remote resource during creation or destruction
+- **Use only as a last resort** — Terraform cannot track changes made by provisioners in its state
+- Prefer immutable images built with **Packer**, `cloud-init` / `user_data`, or **Ansible**
 
 ----
 
-### Provisioners
+### Provisioner Types
 
-```json
+- Built-in provisioners:
+  - `file` — Copies files or directories from the machine running Terraform to the newly created resource
+  - `local-exec` — Invokes a local executable after a resource is created
+  - `remote-exec` — Invokes a script on a remote resource over `SSH` or `WinRM`
+
+----
+
+### Provisioner Example
+
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
+
   provisioner "remote-exec" {
-      inline = [
-          "sudo apt update && sudo apt -y full-upgrade"
-      ]
+    inline = [
+      "sudo apt-get update && sudo apt-get -y full-upgrade"
+    ]
 
-      connection {
-          type = "ssh"
-          host = self.public_ip
-          user = "ubuntu"
-          private_key = file("~/.ssh/id_rsa")
-      }
+    connection {
+      type        = "ssh"
+      host        = self.public_ip
+      user        = "ubuntu"
+      private_key = file("~/.ssh/id_ed25519")
+    }
   }
+}
 ```
 
 ----
 
 ### Variables
 
-Possibilité d'externaliser des variables dans un autre fichier .tf (ex. variables.tf)
+- Parameterize configurations in `variables.tf` with explicit `type`, `description`, `default`, and `validation` rules:
 
-```json
-variable "aws_s3_bucket_terraform" {
-  default = "lgu-bucket"
+```hcl
+variable "s3_bucket_name" {
+  description = "Name of the S3 bucket"
+  type        = string
+  default     = "lgu-bucket"
 }
 
-variable "tags-tool" {
+variable "tags_tool" {
+  type    = string
   default = "Terraform"
 }
 
-variable "tags-contact" {
-    default = "Laurent Grangeau"
+variable "tags_contact" {
+  type    = string
+  default = "Laurent Grangeau"
 }
 ```
 
 ----
 
-### Variables
+### Referencing Variables
 
-Utilisation dans les fichiers .tf
+- Reference input variables anywhere in `.tf` files using `var.<name>`:
 
-```json
-resource "aws_s3_bucket" "lgu-bucket" {
-  bucket = "$var.aws_s3_bucket_terraform"
-  acl    = "private"
+```hcl
+resource "aws_s3_bucket" "lgu_bucket" {
+  bucket = var.s3_bucket_name
 
-  tags {
-    Tool    = "$var.tags-tool"
-    Contact = "$var.tags-contact"
+  tags = {
+    Tool    = var.tags_tool
+    Contact = var.tags_contact
   }
 }
 ```
@@ -134,16 +147,18 @@ resource "aws_s3_bucket" "lgu-bucket" {
 
 ### Modules
 
-Utilisé pour créer des composants réutilisables, améliorer l'organisation et traiter les éléments de l'infrastructure comme une boite noire
+- Package and reuse related resources as a **self-contained black box**
+- Improve **organization**, **encapsulation**, and **standardization** across teams
+- Accept **input variables** and expose **outputs**:
 
-Groupe de ressource qui prend en entrée des *paramètres* et retournent en sortie des *outputs*
-
-```json
+```hcl
 module "lambda" {
-  source            = "./lambda/"
-  toto              = "$var.aws_s3_bucket_toto_key"
-  titi              = "$var.aws_s3_bucket_titi_key"
-  tutu              = "$var.aws_s3_bucket_tutu_key"
+  source = "./modules/lambda"
+
+  function_name = "order-processor"
+  s3_bucket     = var.artifacts_bucket_name
+  s3_key        = var.lambda_package_key
+  runtime       = "nodejs20.x"
 }
 ```
 
@@ -151,70 +166,77 @@ module "lambda" {
 
 ### Outputs
 
-Les modules peuvent produire des outputs que l'on pourra utiliser dans d'autres ressources
+- Expose values from a module or root configuration so other resources, modules, or CI/CD pipelines can consume them:
 
-```json
-output "authorizer_uri" {
-  value = "$aws_lambda_function.lambda_toto.invoke_arn"
+```hcl
+# Inside ./modules/lambda/outputs.tf
+output "invoke_arn" {
+  description = "Invoke ARN of the Lambda function"
+  value       = aws_lambda_function.processor.invoke_arn
 }
 ```
 
-```json
+```hcl
+# Consuming the module output in root main.tf
 resource "aws_api_gateway_authorizer" "custom_authorizer" {
   name                             = "CustomAuthorizer"
-  rest_api_id                      = "$aws_api_gateway_rest_api.toto_api.id"
-  authorizer_uri                   = "$module.lambda.authorizer_uri"
-  identity_validation_expression   = "Bearer .*"
-  authorizer_result_ttl_in_seconds = "30"
+  rest_api_id                      = aws_api_gateway_rest_api.main.id
+  authorizer_uri                   = module.lambda.invoke_arn
+  identity_validation_expression   = "^Bearer [-0-9a-zA-Z\\._]*$"
+  authorizer_result_ttl_in_seconds = 30
 }
 ```
 
 ----
 
-### Data sources
+### Data Sources
 
-Récupère une donnée/ressource existante dans votre infrastructure
+- Query and read **existing resources** or external metadata managed outside the current Terraform stack
+- **Best practice**: Use `data` sources instead of hardcoding `subnet_id`, `vpc_id`, `ami_id`, or `account_id`
 
-Utiliser une source de données est une bonne pratique
-
-En effet, il est bon de privilégier son utilisation plutôt que de coder en dur des ```subnet_id```, ```account_id``` ou autre donnée qui peut être récupérée
-
-```json
-# VPC
-data "aws_subnet" "subnet_id_1" {
+```hcl
+# Query an existing subnet by tag
+data "aws_subnet" "selected" {
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["lgu-subnet"]
- }
+  }
 }
 ```
 
 ----
 
-### Data sources
+### Using Data Sources
 
-Utilisation des data sources dans les fichiers .tf
+- Reference data source attributes via `data.<TYPE>.<NAME>.<ATTRIBUTE>`:
 
-```json
-module "lgu-sn" {
-    source = "lgu-sn"
-    subnet_id_1 = "$data.aws_subnet.subnet_id_1.id"
+```hcl
+module "app_cluster" {
+  source    = "./modules/app-cluster"
+  subnet_id = data.aws_subnet.selected.id
 }
 ```
 
 ----
 
-### Import de ressources
+### Importing Existing Resources
 
-Import de ressources existantes dans les fichiers .tf
-Cela permet de réaliser des migrations progressive de l'infrastructure
+- Bring pre-existing cloud resources under Terraform management for **progressive infrastructure migration**
+- Supports both the CLI command and the declarative `import` block (Terraform `1.5+`):
 
 ```bash
-terraform import aws_instance.frontend i-abcd1234
+$ terraform import aws_instance.frontend i-0abcd1234efgh5678
 ```
 
-```json
+```hcl
+# Declarative import block (Terraform 1.5+)
+import {
+  to = aws_instance.frontend
+  id = "i-0abcd1234efgh5678"
+}
+
 resource "aws_instance" "frontend" {
+  ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t3.micro"
 
   tags = {
@@ -225,56 +247,53 @@ resource "aws_instance" "frontend" {
 
 ----
 
-### State
+### State (`terraform.tfstate`)
 
-Snapshot de l'infrastructure depuis le dernier ```terraform apply```
+- JSON snapshot mapping your declarative `.tf` resources to real-world provider IDs since the last `terraform apply`
+- Stored locally by default (`terraform.tfstate`), but should be stored in a **Remote Backend** for teams
 
-Fichier stocké en local
-
-<img src="https://cdn-images-1.medium.com/max/1024/1*lYFNHNM03biX_95IQMayUw.png" width="512px" />
+![Terraform State Architecture](img/terraform-state.svg)
 
 ----
 
-### State
+### Remote State Backend
 
-Possibilité de stocker ce fichier dans le cloud
+- Store state remotely with **encryption at rest** and **state locking** to prevent concurrent writes:
 
-```json
-# Backend configuration is loaded early so we can't use variables
-
+```hcl
+# Backend configuration is loaded early, so variables cannot be interpolated here
 terraform {
   backend "s3" {
-    region  = "eu-central-1"
-    bucket  = "lgu-bucket"
-    key     = "state.tfstate"
-    encrypt = true
+    region         = "eu-central-1"
+    bucket         = "lgu-terraform-state"
+    key            = "prod/network/terraform.tfstate"
+    encrypt        = true
+    dynamodb_table = "terraform-state-locks"
   }
 }
 ```
 
 ----
 
-### Workspace
+### Workspaces
 
-Permet d'apporter une facilité pour gerer les environnements (évite de devoir gerer un fichier de configuration tfstate par envrionnement)
+- Manage multiple isolated state files (`dev`, `preprod`, `prod`) from the **same configuration directory**
 
 ```bash
-$ terraform workspace list // The command will list all existing workspaces
-$ terraform workspace new <workspace_name> // The command will create a workspace
-$ terraform workspace select <workspace_name> // The command select a workspace
-$ terraform workspace delete <workspace_name> // The command delete a workspace
+$ terraform workspace list            # List all existing workspaces
+$ terraform workspace new <name>      # Create and switch to a new workspace
+$ terraform workspace select <name>   # Switch to an existing workspace
+$ terraform workspace delete <name>   # Delete an empty workspace
 ```
 
 ```bash
 $ terraform workspace list
-default
+  default
 * dev
-preprod
-prod
+  preprod
+  prod
 ```
 
-Gestion de l'état de la variable workspace
-
-```json
-bucket = "$terraform.workspace == "preprod" ? var.bucket_demo_preprod : var.bucket_demo"
+```hcl
+bucket = terraform.workspace == "preprod" ? var.bucket_demo_preprod : var.bucket_demo
 ```

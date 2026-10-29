@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" width="900" height="320" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrowDag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4f46e5"/>
+    </marker>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="320" rx="16" fill="#f8fafc"/>
+
+  <!-- Root node -->
+  <g filter="url(#cardShadow)">
+    <rect x="330" y="22" width="240" height="46" rx="23" fill="#1e293b"/>
+    <text x="450" y="50" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#ffffff">[root] provider.aws</text>
+  </g>
+
+  <!-- Edges from root -->
+  <line x1="400" y1="68" x2="250" y2="112" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+  <line x1="500" y1="68" x2="650" y2="112" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+
+  <!-- Level 2 nodes -->
+  <g filter="url(#cardShadow)">
+    <rect x="115" y="118" width="270" height="52" rx="12" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+    <text x="250" y="149" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#1d4ed8">aws_instance.frontend</text>
+  </g>
+
+  <g filter="url(#cardShadow)">
+    <rect x="515" y="118" width="270" height="52" rx="12" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+    <text x="650" y="149" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#1d4ed8">aws_security_group.web</text>
+  </g>
+
+  <!-- Edges to Level 3 -->
+  <line x1="250" y1="170" x2="250" y2="224" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+  <line x1="340" y1="170" x2="570" y2="224" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+  <line x1="650" y1="170" x2="650" y2="224" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+
+  <!-- Level 3 nodes -->
+  <g filter="url(#cardShadow)">
+    <rect x="115" y="230" width="270" height="52" rx="12" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+    <text x="250" y="261" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#1e40af">aws_subnet.public</text>
+  </g>
+
+  <g filter="url(#cardShadow)">
+    <rect x="515" y="230" width="270" height="52" rx="12" fill="#eef2ff" stroke="#c7d2fe" stroke-width="2"/>
+    <text x="650" y="261" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#3730a3">aws_vpc.main</text>
+  </g>
+</svg>

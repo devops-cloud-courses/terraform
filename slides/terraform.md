@@ -2,45 +2,44 @@
 
 ----
 
-### Qu'est-ce que Terraform ?
+### What is Terraform?
 
-![Image](https://i.pinimg.com/originals/f4/54/15/f45415270449af33c39dcb1e8af5a62a.png)
-
-Créé en 2014 par Hashicorp
-
-Ecrit en Go
-
-Outil qui permet de *construire*, *modifier* et *versionner* une infrastructure
+- Created in **2014** by **HashiCorp** and written in **Go**
+- Declarative **Infrastructure as Code (`IaC`)** tool
+- Enables teams to safely **build**, **change**, and **version** cloud and on-prem infrastructure
 
 ----
 
-### Que fait l'outil ?
+### What does it do?
 
-- Il permet de provisionner une infrastructure As Code
-- Il assure la création et la cohérence d'infrastructure
-- Il permet d'appliquer des modifications incrémentales
-- On peut détruire des ressources si besoin
-- On peut prévisualiser les modifications avant de les appliquer
-
-----
-
-### Trois étapes
-
-- *Write* : écriture de la définition de ses ressources dans des fichiers au format *.tf
-- *Plan* : un plan des ressources à créer/modifier & supprimer est affiché, avant tout changement
-- *Create* : l'infrastructure voulue est mise en place, et reproductible dans tous les environnements souhaités
+- Provisions and manages **Infrastructure as Code (`IaC`)** across any cloud or service API
+- Ensures **consistency** and **reproducibility** across environments (`dev`, `staging`, `prod`)
+- Computes an **execution graph** to apply incremental changes in the right dependency order
+- Previews exact modifications (`+ create`, `~ update`, `- destroy`) before applying them
+- Tears down or replaces resources cleanly when needed
 
 ----
 
-### Exemple
+### Three Core Workflow Stages
 
-```json
-resource "aws_s3_bucket" "lgu-bucket" {
+- **Write**: Author declarative infrastructure definitions in `.tf` files using **HCL**
+- **Plan**: Generate an execution plan comparing desired configuration against current state
+- **Apply**: Provision and converge target infrastructure reproducibly across environments
+
+![Terraform Workflow](img/terraform-workflow.svg)
+
+----
+
+### Example (`main.tf`)
+
+```hcl
+resource "aws_s3_bucket" "lgu_bucket" {
   bucket = "lgu-bucket"
-  acl    = "private"
 
-  tags {
-    Owner = "Laurent Grangeau"
+  tags = {
+    Owner       = "Laurent Grangeau"
+    Environment = "production"
+    ManagedBy   = "Terraform"
   }
 }
 ```

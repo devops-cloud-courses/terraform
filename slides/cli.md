@@ -2,20 +2,18 @@
 
 ----
 
-### Init
+### `terraform init`
 
-Initialise le répertoire de travail qui contient les fichiers de configuration au format .tf
-
-C'est la première commande à exécuter pour une nouvelle configuration, ou après avoir fait un checkout d'une configuration existante, depuis un dépôt git par exemple
+- Initializes a working directory containing `.tf` configuration files
+- Must be run first when bootstrapping a new configuration or after cloning an existing repository from Git
 
 ----
 
-### Init
+### What `terraform init` does
 
-La commande init va :
-- télécharger et installer les fournisseurs (providers)
-- initialiser le backend (si défini)
-- télécharger et installer les modules (si définis)
+- Downloads and installs required **providers** (and records checksums in `.terraform.lock.hcl`)
+- Initializes the configured **state backend** (`local`, `s3`, `gcs`, `azurerm`, `cloud`)
+- Downloads and installs referenced **modules**
 
 ```bash
 $ terraform init
@@ -23,25 +21,27 @@ $ terraform init
 
 ----
 
-### Plan
+### `terraform plan`
 
-Permet de créer un plan d'exécution. Terraform va déterminer quelles actions il doit entreprendre afin d'avoir les ressources listées dans les fichiers de configuration par rapport à ce qui est actuellement en place sur l'environnement/le fournisseur cible
+- Generates a deterministic **execution plan**
+- Compares desired `.tf` configuration against the current state and target cloud APIs to determine which actions (`+ create`, `~ update`, `- destroy`, `-/+ replace`) are needed
 
 ----
 
-### Plan
+### Saving an Execution Plan
 
-Cette commande n'effectue concrètement rien sur l'infrastructure
+- `terraform plan` is a **dry run** — it never modifies real infrastructure
+- Save the plan to a binary file so `terraform apply` executes those exact approved changes:
 
 ```bash
-$ terraform plan -out plan.out
+$ terraform plan -out=plan.out
 ```
 
 ----
 
-### Apply
+### `terraform apply`
 
-Permet d'appliquer les changements à effectuer sur l'infrastructure. C'est cette commande qui va créer les ressources
+- Executes the actions proposed in a Terraform plan to create, update, or replace real infrastructure resources
 
 ```bash
 $ terraform apply plan.out
@@ -49,30 +49,32 @@ $ terraform apply plan.out
 
 ----
 
-### Providers
+### `terraform providers`
 
-Permet de vérifier l'utilisation des providers dans les projets et modules Terraform
+- Displays the tree of providers required by the current configuration and its child modules:
 
 ```bash
 $ terraform providers
+
+Providers required by configuration:
 .
-├── provider.aws ~> 1.54.0
+├── provider[registry.terraform.io/hashicorp/aws] ~> 5.0
 └── module.my_module
-├── provider.aws (inherited)
-└── provider.external
+    ├── provider[registry.terraform.io/hashicorp/aws]
+    └── provider[registry.terraform.io/hashicorp/external]
 ```
 
 ----
 
-### Destroy
+### `terraform destroy`
 
-Permet de supprimer TOUTES les ressources gérées par Terraform
+- Destroys **all** remote objects managed by the current Terraform configuration and state
 
 ```bash
 $ terraform destroy
 ```
 
-Un plan de suppression peut être généré au préalable
+- You can also preview or save a destruction plan beforehand:
 
 ```bash
 $ terraform plan -destroy
@@ -80,33 +82,33 @@ $ terraform plan -destroy
 
 ----
 
-### Console
+### `terraform console`
 
-Permet de connaître la valeur d'une ressource Terraform. Cette commande est pratique pour faire du débogage, avant de créer un plan ou de l'appliquer
+- Opens an interactive shell to evaluate expressions, test built-in functions, and inspect resource attributes before planning or applying:
 
 ```bash
 $ echo "aws_iam_user.lgu.arn" | terraform console
-arn:aws:iam::123456789123:user/lgrangeau
+"arn:aws:iam::123456789012:user/lgrangeau"
 ```
 
 ----
 
-### Get
+### `terraform get`
 
-Permet de récupérer ou mettre à jour un module
+- Downloads and updates child modules mentioned in the root module (`terraform get -update`):
 
 ```bash
-$ terraform get
+$ terraform get -update
 ```
 
 ----
 
-### Graph
+### `terraform graph`
 
-Permet de dessiner un graphique de dépendances visuel des ressources Terraform en fonction des fichiers de configuration
+- Outputs a visual dependency graph (in Graphviz `DOT` format) showing how Terraform orders resource creation:
 
 ```bash
-terraform graph | dot -Tpng > graph.png`
+$ terraform graph | dot -Tpng > graph.png
 ```
 
-<img src="https://aurelie-vache.developpez.com/tutoriels/cloud/terraform-gerer-infrastructure-code/images/image-6.png" width="460px" />
+![Terraform Dependency Graph](img/terraform-graph.svg)
