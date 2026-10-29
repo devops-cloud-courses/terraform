@@ -292,14 +292,10 @@ bucket = terraform.workspace == "preprod" ? var.bucket_demo_preprod : var.bucket
 
 ### Production State Architecture & Blast Radius
 
-- **Why CLI Workspaces alone aren't enough for Production**:
-  - All CLI workspaces share the same state backend bucket/credentials and code branch — a human running `destroy` in the wrong workspace can wipe production
-- **Production Best Practices**:
-  - **Directory-per-Environment** (`envs/dev/`, `envs/prod/` or **Terragrunt**) with separate AWS accounts & IAM roles
-  - **Layered State (Minimize Blast Radius)**: Split monolithic states by change frequency and ownership:
-    - `01-network/terraform.tfstate` (`VPC`, `Subnets`, `NAT` — changes rarely)
-    - `02-data/terraform.tfstate` (`RDS`, `S3`, `KMS` — stateful, strict `prevent_destroy`)
-    - `03-compute/terraform.tfstate` (`EKS`, `Lambda`, `ECS` — changes daily)
+- **Avoid CLI Workspaces alone for Production**: Sharing one backend and credential set across `dev` and `prod` creates a high **blast radius**
+- **Best Practice**: Isolate environments by **directory & cloud account** (`envs/dev/`, `envs/prod/`) and split monolithic state into **lifecycle layers**:
+
+![Terraform Layered State Architecture](img/terraform-layers.svg)
 
 ----
 

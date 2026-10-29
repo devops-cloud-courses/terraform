@@ -30,8 +30,8 @@
 
     <rect x="46" y="96" width="220" height="98" rx="10" fill="#0f172a"/>
     <text x="60" y="120" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#93c5fd">resource "aws_vpc" "main" {</text>
-    <text x="60" y="140" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#e2e8f0">  cidr_block = "10.0.0.0/16"</text>
-    <text x="60" y="160" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#a7f3d0">  enable_dns = true</text>
+    <text x="60" y="140" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#e2e8f0">  cidr_block           = "10.0.0.0/16"</text>
+    <text x="60" y="160" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#a7f3d0">  enable_dns_hostnames = true</text>
     <text x="60" y="180" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#93c5fd">}</text>
 
     <text x="156" y="218" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Versioned in Git (GitOps)</text>

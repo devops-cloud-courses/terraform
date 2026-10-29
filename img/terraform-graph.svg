@@ -10,49 +10,42 @@
 
   <rect width="960" height="350" rx="16" fill="#f8fafc"/>
 
-  <!-- Root node -->
+  <!-- Level 1 (Top): Dependent Compute Resource (Created 3rd) -->
   <g filter="url(#cardShadow)">
-    <rect x="295" y="20" width="370" height="44" rx="22" fill="#0f172a"/>
-    <text x="480" y="47" text-anchor="middle" font-size="12.5" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#ffffff">[root] provider["registry.terraform.io/hashicorp/aws"]</text>
+    <rect x="310" y="18" width="340" height="54" rx="14" fill="#0f172a"/>
+    <text x="480" y="42" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#38bdf8">aws_instance.frontend (Created 3rd)</text>
+    <text x="480" y="60" text-anchor="middle" font-size="10.5" fill="#cbd5e1">Depends on Subnet &amp; Security Group</text>
   </g>
 
-  <!-- Edges from root -->
-  <line x1="410" y1="64" x2="250" y2="108" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
-  <line x1="550" y1="64" x2="710" y2="108" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+  <!-- Dependency Edges from Instance -> Subnet & SG -->
+  <line x1="400" y1="72" x2="250" y2="112" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+  <line x1="560" y1="72" x2="710" y2="112" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
 
-  <!-- Level 2 nodes -->
+  <!-- Level 2 (Middle): Parallel Resources (Created 2nd in parallel) -->
   <g filter="url(#cardShadow)">
-    <rect x="105" y="114" width="290" height="54" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
-    <text x="250" y="138" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#1d4ed8">aws_instance.frontend</text>
-    <text x="250" y="156" text-anchor="middle" font-size="10.5" fill="#64748b">Depends on Subnet &amp; Security Group</text>
-  </g>
-
-  <g filter="url(#cardShadow)">
-    <rect x="565" y="114" width="290" height="54" rx="12" fill="#ffffff" stroke="#4f46e5" stroke-width="2"/>
-    <text x="710" y="138" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#4338ca">aws_security_group.web</text>
-    <text x="710" y="156" text-anchor="middle" font-size="10.5" fill="#64748b">Depends on VPC</text>
-  </g>
-
-  <!-- Edges to Level 3 -->
-  <line x1="250" y1="168" x2="250" y2="212" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
-  <line x1="350" y1="168" x2="620" y2="212" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
-  <line x1="710" y1="168" x2="710" y2="212" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
-
-  <!-- Level 3 nodes -->
-  <g filter="url(#cardShadow)">
-    <rect x="105" y="218" width="290" height="52" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
-    <text x="250" y="249" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#1e40af">aws_subnet.public</text>
+    <rect x="95" y="118" width="310" height="54" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <text x="250" y="142" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#1d4ed8">aws_subnet.public["a"]</text>
+    <text x="250" y="160" text-anchor="middle" font-size="10.5" fill="#059669" font-weight="700">Created 2nd (Parallel Execution)</text>
   </g>
 
   <g filter="url(#cardShadow)">
-    <rect x="565" y="218" width="290" height="52" rx="12" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="2"/>
-    <text x="710" y="249" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#047857">aws_vpc.main (Created 1st)</text>
+    <rect x="555" y="118" width="310" height="54" rx="12" fill="#ffffff" stroke="#4f46e5" stroke-width="2"/>
+    <text x="710" y="142" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#4338ca">aws_security_group.web</text>
+    <text x="710" y="160" text-anchor="middle" font-size="10.5" fill="#059669" font-weight="700">Created 2nd (Parallel Execution)</text>
   </g>
 
-  <!-- Edge Subnet -> VPC -->
-  <line x1="395" y1="244" x2="557" y2="244" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+  <!-- Dependency Edges from Subnet & SG -> VPC -->
+  <line x1="250" y1="172" x2="400" y2="214" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+  <line x1="710" y1="172" x2="560" y2="214" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrowDag)"/>
+
+  <!-- Level 3 (Bottom): Foundation VPC & Provider (Created 1st) -->
+  <g filter="url(#cardShadow)">
+    <rect x="295" y="220" width="370" height="54" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+    <text x="480" y="244" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#047857">aws_vpc.main (Created 1st)</text>
+    <text x="480" y="262" text-anchor="middle" font-size="10.5" font-family="'JetBrains Mono', monospace" fill="#065f46">provider["registry.terraform.io/hashicorp/aws"]</text>
+  </g>
 
   <!-- Bottom note -->
-  <rect x="105" y="290" width="750" height="42" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
-  <text x="480" y="316" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Directed Acyclic Graph (<tspan font-family="'JetBrains Mono', monospace" font-weight="700" fill="#4f46e5">DAG</tspan>): Independent nodes (<tspan font-family="'JetBrains Mono', monospace" fill="#1d4ed8">aws_subnet</tspan> &amp; <tspan font-family="'JetBrains Mono', monospace" fill="#4338ca">aws_security_group</tspan>) are provisioned in parallel</text>
+  <rect x="95" y="292" width="770" height="42" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="480" y="318" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">Directed Acyclic Graph (<tspan font-family="'JetBrains Mono', monospace" font-weight="700" fill="#4f46e5">DAG</tspan>): Arrows show dependency direction; Terraform provisions bottom-up in parallel</text>
 </svg>
