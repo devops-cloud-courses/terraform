@@ -11,12 +11,14 @@
 
 ### What `terraform init` does
 
-- Downloads and installs required **providers** (and records checksums in `.terraform.lock.hcl`)
+- Downloads and installs required **providers** (and verifies SHA-256 hashes in `.terraform.lock.hcl`)
 - Initializes the configured **state backend** (`local`, `s3`, `gcs`, `azurerm`, `cloud`)
 - Downloads and installs referenced **modules**
 
 ```bash
 $ terraform init
+$ terraform init -upgrade      # Upgrade providers/modules within version constraints
+$ terraform init -reconfigure  # Reconfigure backend settings
 ```
 
 ----
@@ -28,13 +30,15 @@ $ terraform init
 
 ----
 
-### Saving an Execution Plan
+### Saving & Optimizing Plans
 
 - `terraform plan` is a **dry run** — it never modifies real infrastructure
-- Save the plan to a binary file so `terraform apply` executes those exact approved changes:
+- Save the plan to a binary file, detect drift, or speed up large states with `-minimal-refresh`:
 
 ```bash
-$ terraform plan -out=plan.out
+$ terraform plan -out=plan.out          # Save exact plan for apply
+$ terraform plan -refresh-only          # Detect drift without changing resources
+$ terraform plan -minimal-refresh       # Only refresh resources with proposed changes (v1.17+)
 ```
 
 ----
@@ -49,6 +53,22 @@ $ terraform apply plan.out
 
 ----
 
+### `terraform test`
+
+- Executes native automated unit and integration tests (`tests/*.tftest.hcl`) against your Terraform modules using real resources or mock providers (`mock_provider`):
+
+```bash
+$ terraform test
+tests/s3_bucket.tftest.hcl... in progress
+  run "valid_bucket_naming"... pass
+tests/s3_bucket.tftest.hcl... tearing down
+tests/s3_bucket.tftest.hcl... pass
+
+Success! 1 passed, 0 failed.
+```
+
+----
+
 ### `terraform providers`
 
 - Displays the tree of providers required by the current configuration and its child modules:
@@ -58,10 +78,10 @@ $ terraform providers
 
 Providers required by configuration:
 .
-├── provider[registry.terraform.io/hashicorp/aws] ~> 5.0
+├── provider[registry.terraform.io/hashicorp/aws] ~> 6.0
 └── module.my_module
     ├── provider[registry.terraform.io/hashicorp/aws]
-    └── provider[registry.terraform.io/hashicorp/external]
+    └── provider[registry.terraform.io/hashicorp/tls]
 ```
 
 ----
@@ -74,7 +94,7 @@ Providers required by configuration:
 $ terraform destroy
 ```
 
-- You can also preview or save a destruction plan beforehand:
+- Preview or save a destruction plan beforehand:
 
 ```bash
 $ terraform plan -destroy
@@ -84,7 +104,7 @@ $ terraform plan -destroy
 
 ### `terraform console`
 
-- Opens an interactive shell to evaluate expressions, test built-in functions, and inspect resource attributes before planning or applying:
+- Opens an interactive shell to evaluate HCL expressions, test built-in functions, and inspect resource attributes:
 
 ```bash
 $ echo "aws_iam_user.lgu.arn" | terraform console
@@ -93,22 +113,12 @@ $ echo "aws_iam_user.lgu.arn" | terraform console
 
 ----
 
-### `terraform get`
-
-- Downloads and updates child modules mentioned in the root module (`terraform get -update`):
-
-```bash
-$ terraform get -update
-```
-
-----
-
 ### `terraform graph`
 
-- Outputs a visual dependency graph (in Graphviz `DOT` format) showing how Terraform orders resource creation:
+- Outputs a visual dependency graph (in Graphviz `DOT` format) showing how Terraform orders parallel resource creation:
 
 ```bash
-$ terraform graph | dot -Tpng > graph.png
+$ terraform graph | dot -Tsvg > graph.svg
 ```
 
 ![Terraform Dependency Graph](img/terraform-graph.svg)

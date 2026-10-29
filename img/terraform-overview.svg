@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="tfBrandGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <marker id="ovArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4f46e5"/>
+    </marker>
+    <filter id="ovShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="960" height="360" rx="16" fill="#f8fafc"/>
+
+  <!-- Left: Git / Practitioner HCL Code -->
+  <g filter="url(#ovShadow)">
+    <rect x="28" y="32" width="256" height="224" rx="16" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+    <rect x="28" y="32" width="256" height="46" rx="16" fill="url(#blueGrad)"/>
+    <text x="156" y="61" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">1. Declarative Code (HCL)</text>
+
+    <rect x="46" y="96" width="220" height="98" rx="10" fill="#0f172a"/>
+    <text x="60" y="120" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#93c5fd">resource "aws_vpc" "main" {</text>
+    <text x="60" y="140" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#e2e8f0">  cidr_block = "10.0.0.0/16"</text>
+    <text x="60" y="160" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#a7f3d0">  enable_dns = true</text>
+    <text x="60" y="180" font-size="11.5" font-family="'JetBrains Mono', monospace" fill="#93c5fd">}</text>
+
+    <text x="156" y="218" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Versioned in Git (GitOps)</text>
+    <text x="156" y="238" text-anchor="middle" font-size="11.5" fill="#64748b">Single source of truth (*.tf)</text>
+  </g>
+
+  <line x1="284" y1="144" x2="334" y2="144" stroke="#4f46e5" stroke-width="3" marker-end="url(#ovArrow)"/>
+
+  <!-- Center: Terraform Engine -->
+  <g filter="url(#ovShadow)">
+    <rect x="344" y="32" width="272" height="224" rx="18" fill="#ffffff" stroke="#c7d2fe" stroke-width="2.5"/>
+    <rect x="344" y="32" width="272" height="46" rx="18" fill="url(#tfBrandGrad)"/>
+    <text x="480" y="61" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">2. Terraform Engine (Go)</text>
+
+    <!-- Isometric Terraform Logo Icon -->
+    <g transform="translate(454, 88) scale(0.9)">
+      <polygon points="0,0 18,10 18,30 0,20" fill="#5c4ee5"/>
+      <polygon points="22,12 40,22 40,42 22,32" fill="#5c4ee5"/>
+      <polygon points="44,22 62,12 62,32 44,42" fill="#4040b2"/>
+      <polygon points="22,36 40,46 40,66 22,56" fill="#5c4ee5"/>
+    </g>
+
+    <rect x="366" y="156" width="228" height="36" rx="8" fill="#eef2ff" stroke="#c7d2fe"/>
+    <text x="480" y="179" text-anchor="middle" font-size="12" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#3730a3">DAG Dependency Graph + Diff</text>
+
+    <rect x="366" y="202" width="228" height="36" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+    <text x="480" y="225" text-anchor="middle" font-size="12" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#6d28d9">State Locking (.tflock)</text>
+  </g>
+
+  <line x1="616" y1="144" x2="666" y2="144" stroke="#4f46e5" stroke-width="3" marker-end="url(#ovArrow)"/>
+
+  <!-- Right: Target Cloud & SaaS Infrastructure -->
+  <g filter="url(#ovShadow)">
+    <rect x="676" y="32" width="256" height="224" rx="16" fill="#ffffff" stroke="#a7f3d0" stroke-width="2"/>
+    <rect x="676" y="32" width="256" height="46" rx="16" fill="url(#greenGrad)"/>
+    <text x="804" y="61" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">3. Multi-Cloud APIs</text>
+
+    <rect x="696" y="96" width="216" height="42" rx="8" fill="#ecfdf5" stroke="#6ee7b7"/>
+    <text x="804" y="122" text-anchor="middle" font-size="12.5" font-weight="800" fill="#065f46">AWS · GCP · Azure · OCI</text>
+
+    <rect x="696" y="148" width="216" height="42" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+    <text x="804" y="174" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1e40af">Kubernetes · Helm · Vault</text>
+
+    <rect x="696" y="200" width="216" height="42" rx="8" fill="#eef2ff" stroke="#c7d2fe"/>
+    <text x="804" y="226" text-anchor="middle" font-size="12.5" font-weight="800" fill="#3730a3">GitHub · Datadog · Cloudflare</text>
+  </g>
+
+  <!-- Bottom Banner -->
+  <g filter="url(#ovShadow)">
+    <rect x="28" y="278" width="904" height="58" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <rect x="44" y="291" width="190" height="32" rx="8" fill="#0f172a"/>
+    <text x="139" y="312" text-anchor="middle" font-size="12" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#ffffff">TERRAFORM v1.17+</text>
+    <text x="256" y="312" font-size="13" font-weight="600" fill="#334155">Created by <tspan font-weight="800" fill="#0f172a">HashiCorp (an IBM Company)</tspan> · Written in <tspan font-weight="800" fill="#2563eb">Go</tspan> · <tspan font-weight="800" fill="#4f46e5">4,000+ Providers</tspan> on Registry</text>
+  </g>
+</svg>

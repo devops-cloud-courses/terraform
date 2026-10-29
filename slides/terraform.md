@@ -4,26 +4,28 @@
 
 ### What is Terraform?
 
-- Created in **2014** by **HashiCorp** and written in **Go**
-- Declarative **Infrastructure as Code (`IaC`)** tool
-- Enables teams to safely **build**, **change**, and **version** cloud and on-prem infrastructure
+- Created in **2014** by **HashiCorp (an IBM Company)** and written in **Go**
+- Industry-standard declarative **Infrastructure as Code (`IaC`)** tool
+- Enables teams to safely **build**, **change**, **test**, and **version** infrastructure across any cloud
+
+![Terraform Overview](img/terraform-overview.svg)
 
 ----
 
 ### What does it do?
 
-- Provisions and manages **Infrastructure as Code (`IaC`)** across any cloud or service API
+- Provisions and manages **Infrastructure as Code (`IaC`)** across any cloud or SaaS API
 - Ensures **consistency** and **reproducibility** across environments (`dev`, `staging`, `prod`)
-- Computes an **execution graph** to apply incremental changes in the right dependency order
-- Previews exact modifications (`+ create`, `~ update`, `- destroy`) before applying them
-- Tears down or replaces resources cleanly when needed
+- Builds a **Directed Acyclic Graph (`DAG`)** to apply incremental changes in parallel
+- Previews exact modifications (`+ create`, `~ update`, `- destroy`, `-/+ replace`) before applying
+- Detects **configuration drift** and enforces **Policy as Code**
 
 ----
 
 ### Three Core Workflow Stages
 
 - **Write**: Author declarative infrastructure definitions in `.tf` files using **HCL**
-- **Plan**: Generate an execution plan comparing desired configuration against current state
+- **Plan**: Generate a speculative execution plan comparing desired code against real state
 - **Apply**: Provision and converge target infrastructure reproducibly across environments
 
 ![Terraform Workflow](img/terraform-workflow.svg)
@@ -32,14 +34,23 @@
 
 ### Example (`main.tf`)
 
+- Modern AWS Provider (`v6.x`) uses dedicated sub-resources for bucket settings (versioning, encryption, ACLs):
+
 ```hcl
 resource "aws_s3_bucket" "lgu_bucket" {
-  bucket = "lgu-bucket"
+  bucket = "lgu-bucket-prod"
 
   tags = {
     Owner       = "Laurent Grangeau"
     Environment = "production"
     ManagedBy   = "Terraform"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "lgu_bucket" {
+  bucket = aws_s3_bucket.lgu_bucket.id
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 ```

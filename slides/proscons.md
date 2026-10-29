@@ -4,21 +4,21 @@
 
 ### IaC Tools Comparison
 
-| Tool | Cloud Support | Language | State Management |
+| Tool | Cloud Support | Language & License | State Management |
 |---|---|---|---|
-| `Terraform` | Multi-cloud (`4,000+` providers) | Declarative (`HCL` / `JSON`) | Local or Remote Backend (`tfstate`) |
-| `CloudFormation` | AWS only | Declarative (`YAML` / `JSON`) | Managed natively by AWS Stacks |
-| `AWS CDK` | AWS (and `CDKTF` / `cdk8s`) | Imperative (`TS`, `Python`, `Go`, `C#`, `Java`) | Synthesizes to CloudFormation |
-| `Pulumi` | Multi-cloud | Imperative (`TS`, `Python`, `Go`, `C#`, `YAML`) | Pulumi Cloud or Self-managed |
+| `Terraform` | Multi-cloud (`4,000+` providers) | Declarative `HCL` / `JSON` (`BUSL 1.1`) | Remote Backend (`S3` `.tflock`, `GCS`, `HCP`) |
+| `OpenTofu` | Multi-cloud (Terraform Registry / OpenTofu) | Declarative `HCL` / `JSON` (`MPL 2.0` Linux Foundation) | Remote Backend + Native Client-Side State Encryption |
+| `CloudFormation` | AWS only | Declarative `YAML` / `JSON` (AWS Managed) | Managed natively by AWS CloudFormation Stacks |
+| `AWS CDK` | AWS (and `cdk8s`) | Imperative (`TS`, `Python`, `Go`, `C#`, `Java`) | Synthesizes to CloudFormation Stacks |
+| `Pulumi` | Multi-cloud | Imperative (`TS`, `Python`, `Go`, `C#`, `YAML`) | Pulumi Cloud or Self-managed (`S3` / `GCS` / `AzBlob`) |
 
 ----
 
-### Comparison: Terraform
+### Comparison: Terraform & OpenTofu
 
-- Supports almost all **AWS**, **GCP**, **Azure**, and SaaS services via a unified workflow
-- Vast ecosystem of community modules and providers (**Terraform Registry** & **OpenTofu** compatible)
-- Declarative **HCL** / **JSON** syntax purpose-built for infrastructure
-- Explicit **State management** with remote backends and locking
+- Supports almost all **AWS**, **GCP**, **Azure**, **Kubernetes**, and SaaS services via a unified workflow
+- **Terraform** (by HashiCorp / IBM, `BUSL 1.1` license) and **OpenTofu** (Linux Foundation `MPL 2.0` open-source fork) share the HCL language and provider ecosystem
+- Native testing (`terraform test`), config-driven refactoring (`import`, `moved`, `removed`), and native S3 locking (`use_lockfile = true`)
 
 ----
 
@@ -26,8 +26,8 @@
 
 - Deep native support for **AWS services** (AWS-only)
 - **Fully managed** and free service provided by AWS (no external state bucket to set up)
-- Native **automatic stack rollback** on deployment failure and EC2 Auto Scaling rolling updates
-- Written in **YAML** or **JSON** (can become verbose on large stacks)
+- Native **automatic stack rollback** on deployment failure and drift detection
+- Written in **YAML** or **JSON** (can become verbose on large multi-account architectures)
 
 ----
 
@@ -35,33 +35,33 @@
 
 - Targets **AWS** by synthesizing high-level code into CloudFormation templates
 - **Open source** framework with rich higher-level abstractions (**L2 / L3 Constructs**)
-- Uses general-purpose programming languages (`TypeScript`, `JavaScript`, `Python`, `Go`, `C#`, `Java`)
-- Supports importing existing resources via `cdk import` / CloudFormation resource import
+- Uses general-purpose programming languages (`TypeScript`, `Python`, `Go`, `C#`, `Java`)
+- Supports importing existing resources via `cdk import` and CloudFormation resource import
 
 ----
 
 ### Comparison: Pulumi
 
-- **Multi-cloud** support (can bridge any Terraform provider plus native cloud APIs)
+- **Multi-cloud** support (bridges Terraform providers plus native cloud APIs like `aws-native`)
 - Uses general-purpose programming languages (`TypeScript`, `Python`, `Go`, `C#`, `Java`, `YAML`)
-- Built-in **State management** (Pulumi Cloud or self-hosted S3/GCS/Blob backend) with native secret encryption
-- Full programming constructs (loops, unit test frameworks, classes), which require strict team conventions
+- Built-in **State management** and secret encryption (Pulumi Cloud / ESC or self-hosted backends)
+- Full programming constructs (loops, unit test frameworks, classes), requiring strict team conventions
 
 ----
 
 ### Terraform: Pros
 
-- Standardizes **Infrastructure as Code (`IaC`)** across multi-cloud and hybrid environments
-- **Concise, readable declarative syntax** (`HCL`) easy for both Ops and Devs to review
-- Strong **modularity and reuse** via variables, locals, outputs, and versioned modules
-- Safe **`terraform plan`** dry-run workflow before any production change
-- Massive community, provider ecosystem, and security/linting tooling (`tflint`, `trivy`, `checkov`)
+- De facto standard for **multi-cloud and hybrid Infrastructure as Code (`IaC`)**
+- **Concise, readable declarative syntax (`HCL`)** easy for both Platform Engineers and Developers to review
+- Strong **modularity and reuse** via typed variables, validations, outputs, and versioned modules
+- Safe **`terraform plan`**, native **`terraform test`**, and **Policy as Code** before any production change
+- Modern secret protection with **`ephemeral` resources** and **write-only (`_wo`) arguments** (`v1.10+`)
 
 ----
 
 ### Terraform: Cons
 
-- **No automatic rollback** on partial `apply` failure (requires fixing forward or re-running `apply`)
-- **State file management** overhead (must secure, lock, and avoid drift in `terraform.tfstate`)
-- **Plaintext secrets in state**: Sensitive values referenced in resources are stored in `tfstate` (mitigated with ephemeral values in Terraform `1.10+` and external secret managers)
-- Can become repetitive without well-structured modules
+- **No automatic rollback** on partial `apply` failure (requires fixing forward and re-running `apply`)
+- **State management responsibility**: Teams must secure, back up, and avoid manual out-of-band drift against `terraform.tfstate`
+- **Legacy secret exposure**: Standard (non-`_wo`) sensitive attributes are still persisted in `tfstate`, requiring encrypted remote backends and strict IAM access controls
+- **License fragmentation**: HashiCorp's switch to `BUSL 1.1` split the ecosystem between **Terraform** and **OpenTofu**

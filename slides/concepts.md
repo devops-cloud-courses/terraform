@@ -6,19 +6,19 @@
 
 - **Human-readable** declarative configuration language (also compatible with JSON)
 - Expresses **desired target state** rather than imperative step-by-step scripts
-- Supports expressions, type constraints, built-in functions (`cidrsubnet`, `jsonencode`, `try`), and dynamic blocks (`for_each`, `count`)
+- Supports rich type constraints (`object`, `map`, `set`), built-in functions (`cidrsubnet`, `jsonencode`, `try`), meta-arguments (`for_each`, `count`, `lifecycle`), and `check` assertions
 
 ----
 
 ### Providers
 
 - Responsible for understanding API interactions and managing a resource's **lifecycle**
-- Built on **CRUD** operations (*Create / Read / Update / Delete*)
+- Built on **CRUD** operations (*Create / Read / Update / Delete*) over `gRPC`
 - Over **4,000+ providers** available on the **Terraform Registry**:
-  - **Public Clouds**: `AWS`, `GCP`, `Azure`, `OVH`, `DigitalOcean`, `Scaleway`
-  - **Platform & Containers**: `Kubernetes`, `Helm`, `Docker`, `Nomad`
-  - **HashiCorp Stack**: `Vault`, `Consul`, `Boundary`
-  - **DevOps & SaaS**: `GitHub`, `GitLab`, `Datadog`, `Cloudflare`, `PostgreSQL`
+  - **Public Clouds**: `AWS`, `GCP`, `Azure`, `OCI`, `OVH`, `Scaleway`
+  - **Platform & Containers**: `Kubernetes`, `Helm`, `Docker`, `Talos`
+  - **Security & Identity**: `Vault`, `Okta`, `Cloudflare`, `TLS`
+  - **DevOps & Data**: `GitHub`, `GitLab`, `Datadog`, `PostgreSQL`, `Snowflake`
 
 ----
 
@@ -30,15 +30,15 @@
 
 ### Configuring Providers
 
-- Declare required provider versions and regional settings in `providers.tf` or `versions.tf`:
+- Pin Terraform and provider versions in `versions.tf` (checksums are locked in `.terraform.lock.hcl`):
 
 ```hcl
 terraform {
-  required_version = ">= 1.9.0"
+  required_version = ">= 1.17.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
   }
 }
@@ -52,72 +52,31 @@ provider "aws" {
 
 ### Provider Authentication
 
-- **Never commit sensitive credentials** (`Access Keys`, `Secrets`, `Tokens`) in `.tf` files
-- Use short-lived credentials (`OIDC`, `IAM Roles`, `Workload Identity`) or environment variables:
+- **Never commit static credentials** (`Access Keys`, `Secrets`, `Tokens`) in `.tf` files
+- Prefer **short-lived identity federation** (`OIDC` Workload Identity in GitHub Actions / GitLab CI, `AWS SSO` / `IAM Roles`) or environment variables:
 
 ```bash
 export AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY"
-export AWS_DEFAULT_REGION="eu-central-1"
+export AWS_REGION="eu-central-1"
 ```
 
 ----
 
-### Provisioners
+### Variables & Validation
 
-- Execute scripts or copy files onto a local or remote resource during creation or destruction
-- **Use only as a last resort** — Terraform cannot track changes made by provisioners in its state
-- Prefer immutable images built with **Packer**, `cloud-init` / `user_data`, or **Ansible**
-
-----
-
-### Provisioner Types
-
-- Built-in provisioners:
-  - `file` — Copies files or directories from the machine running Terraform to the newly created resource
-  - `local-exec` — Invokes a local executable after a resource is created
-  - `remote-exec` — Invokes a script on a remote resource over `SSH` or `WinRM`
-
-----
-
-### Provisioner Example
-
-```hcl
-resource "aws_instance" "web" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t3.micro"
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get update && sudo apt-get -y full-upgrade"
-    ]
-
-    connection {
-      type        = "ssh"
-      host        = self.public_ip
-      user        = "ubuntu"
-      private_key = file("~/.ssh/id_ed25519")
-    }
-  }
-}
-```
-
-----
-
-### Variables
-
-- Parameterize configurations in `variables.tf` with explicit `type`, `description`, `default`, and `validation` rules:
+- Define typed inputs in `variables.tf` with custom `validation` rules:
 
 ```hcl
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket"
   type        = string
-  default     = "lgu-bucket"
-}
+  default     = "lgu-bucket-prod"
 
-variable "tags_tool" {
-  type    = string
-  default = "Terraform"
+  validation {
+    condition     = can(regex("^[a-z0-9-]+$", var.s3_bucket_name))
+    error_message = "Bucket name must contain only lowercase letters, numbers, and hyphens."
+  }
 }
 
 variable "tags_contact" {
@@ -128,18 +87,42 @@ variable "tags_contact" {
 
 ----
 
-### Referencing Variables
+### Referencing Variables & Locals
 
-- Reference input variables anywhere in `.tf` files using `var.<name>`:
+- Combine input variables (`var.<name>`) and reusable `locals` inside `.tf` files:
 
 ```hcl
-resource "aws_s3_bucket" "lgu_bucket" {
-  bucket = var.s3_bucket_name
-
-  tags = {
-    Tool    = var.tags_tool
+locals {
+  common_tags = {
+    Tool    = "Terraform"
     Contact = var.tags_contact
   }
+}
+
+resource "aws_s3_bucket" "lgu_bucket" {
+  bucket = var.s3_bucket_name
+  tags   = local.common_tags
+}
+```
+
+----
+
+### Ephemeral Values & Secrets (`Terraform 1.10+`)
+
+- **Ephemeral variables/resources (`ephemeral = true`)** and **write-only arguments (`_wo`)** prevent sensitive credentials from ever being stored in `terraform.tfstate` or plan files:
+
+```hcl
+ephemeral "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = "prod/rds/master-password"
+}
+
+resource "aws_db_instance" "postgres" {
+  identifier           = "prod-postgres"
+  engine               = "postgres"
+  instance_class       = "db.t4g.micro"
+  username             = "dbadmin"
+  password_wo          = ephemeral.aws_secretsmanager_secret_version.db_password.secret_string
+  password_wo_version  = 1
 }
 ```
 
@@ -147,18 +130,19 @@ resource "aws_s3_bucket" "lgu_bucket" {
 
 ### Modules
 
-- Package and reuse related resources as a **self-contained black box**
-- Improve **organization**, **encapsulation**, and **standardization** across teams
+- Package and reuse related resources as a **versioned, self-contained component**
+- Improve **organization**, **encapsulation**, and **standardization** across platform teams
 - Accept **input variables** and expose **outputs**:
 
 ```hcl
 module "lambda" {
-  source = "./modules/lambda"
+  source  = "./modules/lambda"
 
   function_name = "order-processor"
   s3_bucket     = var.artifacts_bucket_name
   s3_key        = var.lambda_package_key
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs22.x"
+  architectures = ["arm64"]
 }
 ```
 
@@ -191,15 +175,20 @@ resource "aws_api_gateway_authorizer" "custom_authorizer" {
 
 ### Data Sources
 
-- Query and read **existing resources** or external metadata managed outside the current Terraform stack
-- **Best practice**: Use `data` sources instead of hardcoding `subnet_id`, `vpc_id`, `ami_id`, or `account_id`
+- Query and read **existing resources**, dynamic AMI IDs, or external metadata
+- **Best practice**: Always use `data` sources instead of hardcoding `subnet_id`, `vpc_id`, `ami_id`, or `account_id`
 
 ```hcl
+# Dynamically fetch the latest Amazon Linux 2023 ARM64 AMI via SSM
+data "aws_ssm_parameter" "al2023_ami" {
+  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64"
+}
+
 # Query an existing subnet by tag
 data "aws_subnet" "selected" {
   filter {
     name   = "tag:Name"
-    values = ["lgu-subnet"]
+    values = ["lgu-subnet-private"]
   }
 }
 ```
@@ -211,37 +200,49 @@ data "aws_subnet" "selected" {
 - Reference data source attributes via `data.<TYPE>.<NAME>.<ATTRIBUTE>`:
 
 ```hcl
-module "app_cluster" {
-  source    = "./modules/app-cluster"
-  subnet_id = data.aws_subnet.selected.id
+resource "aws_instance" "frontend" {
+  ami           = data.aws_ssm_parameter.al2023_ami.value
+  instance_type = "t4g.micro"
+  subnet_id     = data.aws_subnet.selected.id
+
+  tags = {
+    Name = "Frontend-Server"
+  }
 }
 ```
 
 ----
 
-### Importing Existing Resources
+### Config-Driven Import & Refactoring
 
-- Bring pre-existing cloud resources under Terraform management for **progressive infrastructure migration**
-- Supports both the CLI command and the declarative `import` block (Terraform `1.5+`):
-
-```bash
-$ terraform import aws_instance.frontend i-0abcd1234efgh5678
-```
+- Bring existing cloud resources under Terraform management and generate HCL automatically (`terraform plan -generate-config-out=generated.tf`)
+- Use declarative `import`, `moved`, and `removed` blocks instead of manual state surgery:
 
 ```hcl
-# Declarative import block (Terraform 1.5+)
 import {
   to = aws_instance.frontend
   id = "i-0abcd1234efgh5678"
 }
 
-resource "aws_instance" "frontend" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t3.micro"
+moved {
+  from = aws_instance.old_name
+  to   = aws_instance.frontend
+}
+```
 
-  tags = {
-    Name = "Frontend-HelloWorld"
-  }
+----
+
+### Provisioners (Legacy / Last Resort)
+
+- Execute scripts (`local-exec`, `remote-exec`) or copy files (`file`) during creation/destruction
+- **Discouraged by HashiCorp** — Terraform cannot track imperative changes made by provisioners
+- Prefer immutable images (**Packer**), `user_data` / `cloud-init`, or **SSM / Ansible**:
+
+```hcl
+resource "aws_instance" "web" {
+  ami           = data.aws_ssm_parameter.al2023_ami.value
+  instance_type = "t4g.micro"
+  user_data     = file("${path.module}/cloud-init.yaml")
 }
 ```
 
@@ -250,25 +251,25 @@ resource "aws_instance" "frontend" {
 ### State (`terraform.tfstate`)
 
 - JSON snapshot mapping your declarative `.tf` resources to real-world provider IDs since the last `terraform apply`
-- Stored locally by default (`terraform.tfstate`), but should be stored in a **Remote Backend** for teams
+- Stored locally by default (`terraform.tfstate`), but must be stored in a **Remote Backend** for teams
 
 ![Terraform State Architecture](img/terraform-state.svg)
 
 ----
 
-### Remote State Backend
+### Remote State Backend & Native S3 Locking
 
-- Store state remotely with **encryption at rest** and **state locking** to prevent concurrent writes:
+- Store state remotely with **encryption at rest** and **native S3 state locking (`use_lockfile = true`)**
+- *Note: `use_lockfile = true` uses S3 conditional writes (`.tflock`) and replaces the deprecated `dynamodb_table` lock table!*
 
 ```hcl
-# Backend configuration is loaded early, so variables cannot be interpolated here
 terraform {
   backend "s3" {
-    region         = "eu-central-1"
-    bucket         = "lgu-terraform-state"
-    key            = "prod/network/terraform.tfstate"
-    encrypt        = true
-    dynamodb_table = "terraform-state-locks"
+    region       = "eu-central-1"
+    bucket       = "lgu-terraform-state"
+    key          = "prod/network/terraform.tfstate"
+    encrypt      = true
+    use_lockfile = true
   }
 }
 ```

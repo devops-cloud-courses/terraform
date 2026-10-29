@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 350" width="920" height="350" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
   <defs>
     <linearGradient id="stateGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#2563eb"/>
@@ -12,54 +12,68 @@
     </filter>
   </defs>
 
-  <rect width="920" height="350" rx="16" fill="#f8fafc"/>
+  <rect width="960" height="360" rx="16" fill="#f8fafc"/>
 
   <!-- Left: Desired State -->
   <g filter="url(#cardShadow)">
-    <rect x="35" y="65" width="235" height="220" rx="16" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
-    <rect x="55" y="88" width="195" height="36" rx="8" fill="#eff6ff"/>
-    <text x="152" y="111" text-anchor="middle" font-size="14" font-weight="800" fill="#1d4ed8">Desired State</text>
-    <text x="152" y="148" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#0f172a">main.tf</text>
-    <text x="152" y="176" text-anchor="middle" font-size="12" fill="#475569">Declared in Git repo</text>
-    <rect x="55" y="196" width="195" height="66" rx="8" fill="#0f172a"/>
-    <text x="70" y="220" font-size="11" font-family="'JetBrains Mono', monospace" fill="#93c5fd">instance_type = "t3.micro"</text>
-    <text x="70" y="242" font-size="11" font-family="'JetBrains Mono', monospace" fill="#a7f3d0">count         = 2</text>
+    <rect x="28" y="45" width="250" height="270" rx="16" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+    <rect x="48" y="66" width="210" height="38" rx="8" fill="#eff6ff"/>
+    <text x="153" y="90" text-anchor="middle" font-size="14" font-weight="800" fill="#1d4ed8">Desired State (Code)</text>
+    <text x="153" y="128" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#0f172a">main.tf</text>
+    <text x="153" y="150" text-anchor="middle" font-size="12" fill="#475569">Authored in Git repository</text>
+
+    <rect x="48" y="168" width="210" height="76" rx="8" fill="#0f172a"/>
+    <text x="62" y="192" font-size="11" font-family="'JetBrains Mono', monospace" fill="#93c5fd">instance_type = "t3.micro"</text>
+    <text x="62" y="212" font-size="11" font-family="'JetBrains Mono', monospace" fill="#a7f3d0">count         = 2</text>
+    <text x="62" y="232" font-size="11" font-family="'JetBrains Mono', monospace" fill="#fcd34d">password_wo   = var.db_pwd</text>
+
+    <rect x="48" y="256" width="210" height="40" rx="8" fill="#fef3c7" stroke="#fde68a"/>
+    <text x="153" y="280" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#92400e">ephemeral / _wo omit secrets</text>
   </g>
 
   <!-- Arrow Left <-> Center -->
-  <line x1="278" y1="175" x2="332" y2="175" stroke="#2563eb" stroke-width="3" marker-start="url(#arrowBi)" marker-end="url(#arrowBi)"/>
-  <text x="305" y="158" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#2563eb">Diff</text>
+  <line x1="286" y1="180" x2="340" y2="180" stroke="#2563eb" stroke-width="3" marker-start="url(#arrowBi)" marker-end="url(#arrowBi)"/>
+  <text x="313" y="164" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#2563eb">Diff</text>
 
   <!-- Center: Terraform State -->
   <g filter="url(#cardShadow)">
-    <rect x="342" y="42" width="236" height="266" rx="18" fill="#ffffff" stroke="#4f46e5" stroke-width="2.5"/>
-    <rect x="362" y="64" width="196" height="44" rx="10" fill="url(#stateGrad)"/>
-    <text x="460" y="92" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">Terraform State</text>
+    <rect x="350" y="30" width="260" height="300" rx="18" fill="#ffffff" stroke="#4f46e5" stroke-width="2.5"/>
+    <rect x="370" y="50" width="220" height="44" rx="10" fill="url(#stateGrad)"/>
+    <text x="480" y="78" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">Terraform State</text>
 
-    <text x="460" y="134" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#3730a3">terraform.tfstate</text>
-    <text x="460" y="158" text-anchor="middle" font-size="12" fill="#475569">Maps HCL resources to</text>
-    <text x="460" y="176" text-anchor="middle" font-size="12" fill="#475569">real-world provider IDs</text>
+    <text x="480" y="118" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#3730a3">terraform.tfstate</text>
+    <text x="480" y="140" text-anchor="middle" font-size="12" fill="#475569">Maps HCL addresses to</text>
+    <text x="480" y="158" text-anchor="middle" font-size="12" fill="#475569">real-world cloud IDs</text>
 
-    <rect x="364" y="194" width="192" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe"/>
-    <text x="460" y="216" text-anchor="middle" font-size="12" font-weight="700" fill="#312e81">Remote Backend</text>
-    <text x="460" y="236" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" fill="#4338ca">S3 / GCS / Azure Blob</text>
-    <text x="460" y="256" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" fill="#059669">+ State Locking &amp; Encryption</text>
+    <rect x="370" y="176" width="220" height="134" rx="10" fill="#eef2ff" stroke="#c7d2fe"/>
+    <text x="480" y="200" text-anchor="middle" font-size="13" font-weight="800" fill="#312e81">Remote Backend</text>
+    <text x="480" y="222" text-anchor="middle" font-size="11.5" font-family="'JetBrains Mono', monospace" font-weight="600" fill="#4338ca">S3 / GCS / Azure Blob / HCP</text>
+
+    <rect x="386" y="236" width="188" height="28" rx="6" fill="#ecfdf5" stroke="#a7f3d0"/>
+    <text x="480" y="255" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#047857">use_lockfile = true (.tflock)</text>
+
+    <rect x="386" y="272" width="188" height="28" rx="6" fill="#ffffff" stroke="#c7d2fe"/>
+    <text x="480" y="291" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#3730a3">encrypt = true (AES-256/KMS)</text>
   </g>
 
   <!-- Arrow Center <-> Right -->
-  <line x1="586" y1="175" x2="640" y2="175" stroke="#2563eb" stroke-width="3" marker-start="url(#arrowBi)" marker-end="url(#arrowBi)"/>
-  <text x="613" y="158" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#2563eb">Sync</text>
+  <line x1="618" y1="180" x2="672" y2="180" stroke="#2563eb" stroke-width="3" marker-start="url(#arrowBi)" marker-end="url(#arrowBi)"/>
+  <text x="645" y="164" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#2563eb">Refresh</text>
 
   <!-- Right: Actual Cloud Infrastructure -->
   <g filter="url(#cardShadow)">
-    <rect x="650" y="65" width="235" height="220" rx="16" fill="#ffffff" stroke="#a7f3d0" stroke-width="2"/>
-    <rect x="670" y="88" width="195" height="36" rx="8" fill="#ecfdf5"/>
-    <text x="767" y="111" text-anchor="middle" font-size="14" font-weight="800" fill="#047857">Real Infrastructure</text>
-    <text x="767" y="148" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#0f172a">Cloud Provider</text>
-    <text x="767" y="176" text-anchor="middle" font-size="12" fill="#475569">Live running resources</text>
+    <rect x="682" y="45" width="250" height="270" rx="16" fill="#ffffff" stroke="#a7f3d0" stroke-width="2"/>
+    <rect x="702" y="66" width="210" height="38" rx="8" fill="#ecfdf5"/>
+    <text x="807" y="90" text-anchor="middle" font-size="14" font-weight="800" fill="#047857">Real Infrastructure</text>
+    <text x="807" y="128" text-anchor="middle" font-size="13" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#0f172a">Live Cloud APIs</text>
+    <text x="807" y="150" text-anchor="middle" font-size="12" fill="#475569">Actual running resources</text>
 
-    <rect x="670" y="196" width="195" height="66" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="686" y="220" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="600" fill="#059669">i-0a1b2c3d4e (t3.micro)</text>
-    <text x="686" y="242" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="600" fill="#059669">i-0f9e8d7c6b (t3.micro)</text>
+    <rect x="702" y="168" width="210" height="76" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="718" y="192" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#059669">i-0a1b2c3d4e (t3.micro)</text>
+    <text x="718" y="212" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#059669">i-0f9e8d7c6b (t3.micro)</text>
+    <text x="718" y="232" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="600" fill="#2563eb">rds-prod-01  (encrypted)</text>
+
+    <rect x="702" y="256" width="210" height="40" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="807" y="280" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="700" fill="#1d4ed8">Drift Detection on Plan</text>
   </g>
 </svg>
