@@ -6,11 +6,11 @@
 
 | Tool | Cloud Support | Language & License | State Management |
 |---|---|---|---|
-| `Terraform` | Multi-cloud (`4,000+` providers) | Declarative `HCL` / `JSON` (`BUSL 1.1`) | Remote Backend (`S3` `.tflock`, `GCS`, `HCP`) |
-| `OpenTofu` | Multi-cloud (Terraform Registry / OpenTofu) | Declarative `HCL` / `JSON` (`MPL 2.0` Linux Foundation) | Remote Backend + Native Client-Side State Encryption |
-| `CloudFormation` | AWS only | Declarative `YAML` / `JSON` (AWS Managed) | Managed natively by AWS CloudFormation Stacks |
-| `AWS CDK` | AWS (and `cdk8s`) | Imperative (`TS`, `Python`, `Go`, `C#`, `Java`) | Synthesizes to CloudFormation Stacks |
-| `Pulumi` | Multi-cloud | Imperative (`TS`, `Python`, `Go`, `C#`, `YAML`) | Pulumi Cloud or Self-managed (`S3` / `GCS` / `AzBlob`) |
+| `Terraform` | Multi-cloud (`4,000+` providers) | Declarative `HCL` (`BUSL 1.1`) | Remote Backend (`S3` `.tflock`, `GCS`, `HCP`) |
+| `OpenTofu` | Multi-cloud (`OpenTofu Registry`) | Declarative `HCL` (`MPL 2.0` Linux Fdn) | Remote Backend + Native State Encryption |
+| `CloudFormation` | AWS only | Declarative `YAML` / `JSON` | Managed by AWS CloudFormation Stacks |
+| `AWS CDK` | AWS (and `cdk8s`) | Imperative (`TS`, `Python`, `Go`, `Java`) | Synthesizes to CloudFormation Stacks |
+| `Pulumi` | Multi-cloud | Imperative (`TS`, `Python`, `Go`, `YAML`) | Pulumi Cloud or Self-managed (`S3` / `GCS`) |
 
 ----
 

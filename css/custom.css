@@ -383,8 +383,8 @@
   overflow: hidden;
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-color);
-  font-size: 0.82em;
-  margin: 0.4em 0;
+  font-size: 0.76em;
+  margin: 0.35em 0;
 }
 
 .reveal table:not(.hljs-ln) thead th {
@@ -393,8 +393,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-size: 0.85em;
-  padding: 0.85em 1.1em;
+  font-size: 0.84em;
+  padding: 0.65em 0.95em;
   border-bottom: none;
 }
 
@@ -411,11 +411,11 @@
 }
 
 .reveal table:not(.hljs-ln) tbody td {
-  padding: 0.75em 1.1em;
+  padding: 0.55em 0.95em;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-secondary);
   vertical-align: middle;
-  line-height: 1.45;
+  line-height: 1.35;
 }
 
 .reveal table:not(.hljs-ln) tbody tr:last-child td {
@@ -425,7 +425,7 @@
 .reveal table:not(.hljs-ln) th:first-child,
 .reveal table:not(.hljs-ln) td:first-child {
   text-align: left;
-  width: 170px;
+  white-space: nowrap;
 }
 
 .reveal table:not(.hljs-ln) tbody td:first-child {
