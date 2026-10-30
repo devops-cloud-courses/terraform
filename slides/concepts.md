@@ -69,9 +69,8 @@ export AWS_REGION="eu-central-1"
 
 ```hcl
 variable "s3_bucket_name" {
-  description = "Name of the S3 bucket"
-  type        = string
-  default     = "lgu-bucket-prod"
+  type    = string
+  default = "lgu-bucket-prod"
 
   validation {
     condition     = can(regex("^[a-z0-9-]+$", var.s3_bucket_name))
@@ -109,8 +108,8 @@ resource "aws_s3_bucket" "lgu_bucket" {
 
 ### Data Sources
 
-- Query and read **existing resources**, dynamic AMI IDs, or external metadata
-- **Best practice**: Always use `data` sources instead of hardcoding `subnet_id`, `vpc_id`, `ami_id`, or `account_id`
+- Query **existing cloud resources**, dynamic AMI IDs, or external metadata
+- **Best practice**: Never hardcode `subnet_id`, `vpc_id`, `ami_id`, or `account_id`
 
 ```hcl
 # Dynamically fetch the latest Amazon Linux 2023 ARM64 AMI via SSM
@@ -149,24 +148,20 @@ resource "aws_instance" "frontend" {
 
 ### Outputs
 
-- Expose values from a module or root configuration so other resources, modules, or CI/CD pipelines can consume them:
+- Expose values from a module or root configuration for other modules or CI/CD pipelines:
 
 ```hcl
-# Inside ./modules/lambda/outputs.tf
+# 1. Expose value in ./modules/lambda/outputs.tf
 output "invoke_arn" {
   description = "Invoke ARN of the Lambda function"
   value       = aws_lambda_function.processor.invoke_arn
 }
-```
 
-```hcl
-# Consuming the module output in root main.tf
+# 2. Consume module output in root main.tf
 resource "aws_api_gateway_authorizer" "custom_authorizer" {
-  name                             = "CustomAuthorizer"
-  rest_api_id                      = aws_api_gateway_rest_api.main.id
-  authorizer_uri                   = module.lambda.invoke_arn
-  identity_validation_expression   = "^Bearer [-0-9a-zA-Z\\._]*$"
-  authorizer_result_ttl_in_seconds = 30
+  name           = "CustomAuthorizer"
+  rest_api_id    = aws_api_gateway_rest_api.main.id
+  authorizer_uri = module.lambda.invoke_arn
 }
 ```
 
@@ -174,12 +169,11 @@ resource "aws_api_gateway_authorizer" "custom_authorizer" {
 
 ### Scaling Resources: `for_each` vs. `count`
 
-- **Avoid `count` for non-identical resources**: Removing element `[0]` from a list shifts all subsequent indices (`[1] -> [0]`), forcing Terraform to **destroy and recreate** remaining resources!
-- **Prefer `for_each`** (keyed by stable map keys or a `set(string)`):
+- **Avoid `count` for non-identical resources**: Removing `[0]` shifts indices (`[1] -> [0]`), recreating resources!
+- **Prefer `for_each`** keyed by stable map keys or a `set(string)`:
 
 ```hcl
 variable "availability_zones" {
-  type    = map(string)
   default = { a = "10.0.1.0/24", b = "10.0.2.0/24" }
 }
 
@@ -190,7 +184,7 @@ resource "aws_subnet" "public" {
   cidr_block        = each.value
   tags              = { Name = "public-${each.key}" }
 }
-# Address in state: aws_subnet.public["a"], aws_subnet.public["b"]
+# State addresses: aws_subnet.public["a"], aws_subnet.public["b"]
 ```
 
 ----
@@ -198,13 +192,11 @@ resource "aws_subnet" "public" {
 ### Modules
 
 - Package and reuse related resources as a **versioned, self-contained component**
-- Improve **organization**, **encapsulation**, and **standardization** across platform teams
-- Accept **input variables** and expose **outputs**:
+- Accept **input variables** and expose **outputs** for standardization across teams:
 
 ```hcl
 module "lambda" {
-  source  = "./modules/lambda"
-
+  source        = "./modules/lambda"
   function_name = "order-processor"
   s3_bucket     = var.artifacts_bucket_name
   s3_key        = var.lambda_package_key
@@ -217,8 +209,8 @@ module "lambda" {
 
 ### State (`terraform.tfstate`)
 
-- JSON snapshot mapping declarative `.tf` resources to real-world cloud IDs since the last `terraform apply`
-- Stored locally by default (`terraform.tfstate`), but must be stored in a **Remote Backend** for teams
+- JSON snapshot mapping declarative `.tf` resources to real-world cloud IDs
+- Stored locally by default (`terraform.tfstate`), or in a **Remote Backend** for teams
 
 ![Terraform State Architecture](img/terraform-state.svg)
 
@@ -245,8 +237,7 @@ terraform {
 
 ### Ephemeral Values & Secrets (`Terraform 1.10+`)
 
-- Because standard resource attributes are saved in `terraform.tfstate`, sensitive values require special handling
-- **Ephemeral resources (`ephemeral`)** and **write-only arguments (`_wo`)** ensure secrets are **never stored** in state or plan files:
+- Standard resource attributes are saved in `terraform.tfstate` — use **`ephemeral` resources** and **write-only arguments (`_wo`)** so secrets are **never stored** in state or plan files:
 
 ```hcl
 ephemeral "aws_secretsmanager_secret_version" "db_password" {
@@ -254,12 +245,12 @@ ephemeral "aws_secretsmanager_secret_version" "db_password" {
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier           = "prod-postgres"
-  engine               = "postgres"
-  instance_class       = "db.t4g.micro"
-  username             = "dbadmin"
-  password_wo          = ephemeral.aws_secretsmanager_secret_version.db_password.secret_string
-  password_wo_version  = 1
+  identifier          = "prod-postgres"
+  engine              = "postgres"
+  instance_class      = "db.t4g.micro"
+  username            = "dbadmin"
+  password_wo         = ephemeral.aws_secretsmanager_secret_version.db_password.secret_string
+  password_wo_version = 1
 }
 ```
 
@@ -287,8 +278,8 @@ bucket = terraform.workspace == "preprod" ? var.bucket_demo_preprod : var.bucket
 
 ### Production State Architecture & Blast Radius
 
-- **Avoid CLI Workspaces alone in Prod**: Sharing one backend/credentials across `dev` and `prod` creates a high **blast radius**
-- **Best Practice**: Isolate environments by **directory & account** (`envs/dev/`, `envs/prod/`) and split state into **layers**:
+- **Avoid CLI Workspaces alone in Prod**: Sharing one backend across `dev` and `prod` increases **blast radius**
+- **Best Practice**: Isolate environments by **directory & account** (`envs/prod/`) and split state into **layers**:
 
 ![Terraform Layered State Architecture](img/terraform-layers.svg)
 
@@ -302,12 +293,10 @@ bucket = terraform.workspace == "preprod" ? var.bucket_demo_preprod : var.bucket
 resource "aws_instance" "web" {
   ami           = data.aws_ssm_parameter.al2023_ami.value
   instance_type = "t4g.micro"
-
   lifecycle {
     create_before_destroy = true                  # Zero-downtime replacement
     prevent_destroy       = true                  # Block accidental deletion
     ignore_changes        = [tags["LastScanned"]] # Ignore external mutators
-
     postcondition {
       condition     = self.public_dns != ""
       error_message = "Instance must be assigned a public DNS hostname."

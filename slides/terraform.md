@@ -4,8 +4,8 @@
 
 ### What is Terraform?
 
-- Created in **2014** by **HashiCorp (an IBM Company)** in **Go** — the de facto standard for **Infrastructure as Code (`IaC`)**
-- Enables teams to safely **build**, **change**, **test**, and **version** infrastructure across any cloud or SaaS API
+- Created in **2014** by **HashiCorp (IBM)** in **Go** — the de facto standard for **Infrastructure as Code (`IaC`)**
+- Safely **build**, **change**, **test**, and **version** infrastructure across any cloud or SaaS API
 
 ![Terraform Overview](img/terraform-overview.svg)
 
@@ -24,7 +24,7 @@
 ### Three Core Workflow Stages
 
 - **Write**: Author declarative infrastructure definitions in `.tf` files using **HCL**
-- **Plan**: Generate a speculative execution plan comparing desired code against real state
+- **Plan**: Preview exact execution changes comparing desired code against real state
 - **Apply**: Provision and converge target infrastructure reproducibly across environments
 
 ![Terraform Workflow](img/terraform-workflow.svg)
@@ -33,17 +33,12 @@
 
 ### Example (`main.tf`)
 
-- Modern AWS Provider (`v6.x`) uses dedicated sub-resources for bucket settings (versioning, encryption, ACLs):
+- Modern AWS Provider (`v6.x`) uses dedicated sub-resources for bucket settings:
 
 ```hcl
 resource "aws_s3_bucket" "lgu_bucket" {
   bucket = "lgu-bucket-prod"
-
-  tags = {
-    Owner       = "Laurent Grangeau"
-    Environment = "production"
-    ManagedBy   = "Terraform"
-  }
+  tags   = { Owner = "Laurent Grangeau", Environment = "production" }
 }
 
 resource "aws_s3_bucket_versioning" "lgu_bucket" {

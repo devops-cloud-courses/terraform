@@ -31,9 +31,9 @@
 
 ### Core Engineering Principles (`MSc Key Concepts`)
 
-- **Idempotency & Convergence**: Applying the same configuration `N` times yields the exact same infrastructure state (`apply(apply(S)) == apply(S)`) with zero unintended side effects
-- **Immutable Infrastructure (*Pets vs. Cattle*)**: Instead of SSH-ing into servers to patch them in place, replace instances from golden images (**Packer** / containers) via `create_before_destroy`
+- **Idempotency & Convergence**: Applying configuration `N` times yields the exact same state (`apply(apply(S)) == apply(S)`) with zero side effects
+- **Immutable Infrastructure (*Pets vs. Cattle*)**: Replace instances from golden images (**Packer** / containers) via `create_before_destroy` instead of patching in place
 - **Separation of Concerns**:
   - **Terraform**: Provisions cloud topology (`VPC`, `EKS`, `RDS`, `IAM`, `S3`, `DNS`)
-  - **Packer / Docker**: Builds immutable VM/container artifacts
+  - **Packer / Docker**: Builds immutable VM and container artifacts
   - **Kubernetes / Helm / ArgoCD**: Orchestrates application workloads on top

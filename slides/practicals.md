@@ -28,9 +28,7 @@ on darwin_arm64
 
 ```bash
 $ terraform init
-
 Initializing the backend...
-
 Initializing provider plugins...
 - Finding hashicorp/aws versions matching "~> 6.0"...
 - Installing hashicorp/aws v6.70.0...
@@ -63,7 +61,6 @@ Success! 3 passed, 0 failed.
 
 ```bash
 $ terraform plan -out=plan.out
-
 Terraform used the selected providers to generate the following execution plan.
 Resource actions are indicated with the following symbols:
   + create
@@ -74,7 +71,6 @@ Terraform will perform the following actions:
       + bucket = "lgu-bucket-prod"
       + id     = (known after apply)
     }
-...
 Plan: 8 to add, 0 to change, 0 to destroy.
 Saved the plan to: plan.out
 ```
@@ -135,18 +131,14 @@ Destroy complete! Resources: 8 destroyed.
 - Scan `.tf` files and `plan.json` in CI/CD before allowing any merge to `main`:
 
 ```bash
-# 1. Linting & provider-aware rules
-$ tflint --recursive
+# 1. Linting & security misconfiguration scan (public S3, open 0.0.0.0/0 SSH)
+$ tflint --recursive && trivy config .
 
-# 2. Security & misconfiguration scan (e.g., public S3 buckets, open 0.0.0.0/0 SSH)
-$ trivy config .
-
-# 3. Policy as Code evaluation (Open Policy Agent / Rego against plan.json)
+# 2. Policy as Code evaluation (Open Policy Agent / Rego against plan.json)
 $ opa exec --decision terraform/analysis/authz --bundle policy/ plan.json
 
-# 4. FinOps cloud cost diff posted directly on the Pull Request
-$ infracost diff --path=plan.json
-# Monthly cost change: +$42.10 (+12%)
+# 3. FinOps cloud cost diff posted directly on the Pull Request
+$ infracost diff --path=plan.json   # Monthly cost change: +$42.10 (+12%)
 ```
 
 ----
@@ -162,7 +154,7 @@ $ infracost diff --path=plan.json
 ### MSc Lab Requirements & Acceptance Criteria
 
 1. **State & Providers**: Configure `terraform >= 1.17.0`, `hashicorp/aws ~> 6.0`, and an S3 backend with `use_lockfile = true`
-2. **Dynamic Networking (`for_each`)**: Create a VPC (`10.0.0.0/16`) and provision 2 public subnets across `eu-central-1a` and `eu-central-1b` using `for_each` (no `count`!)
-3. **Compute & Data Sources**: Lookup the latest **Amazon Linux 2023 ARM64 AMI** dynamically via `data "aws_ssm_parameter"` and deploy `t4g.micro` instances with `create_before_destroy = true`
-4. **Secure Storage**: Create an `aws_s3_bucket` with `aws_s3_bucket_versioning` enabled and a variable `validation` rule enforcing lowercase naming
-5. **Verification**: Add a `check` block or `tests/main.tftest.hcl` unit test suite and pass `terraform fmt -check`, `terraform validate`, and `terraform test`
+2. **Dynamic Networking (`for_each`)**: Create a VPC (`10.0.0.0/16`) and 2 public subnets (`eu-central-1a`, `eu-central-1b`) via `for_each`
+3. **Compute & Data Sources**: Lookup the latest **AL2023 ARM64 AMI** via `data "aws_ssm_parameter"` and deploy `t4g.micro` with `create_before_destroy`
+4. **Secure Storage**: Create an `aws_s3_bucket` with `aws_s3_bucket_versioning` and a variable `validation` rule enforcing lowercase naming
+5. **Verification**: Add a `check` block or `tests/main.tftest.hcl` suite and pass `terraform fmt -check`, `validate`, and `test`
