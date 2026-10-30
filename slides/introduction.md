@@ -29,7 +29,7 @@
 
 ----
 
-### Core Engineering Principles (`MSc Key Concepts`)
+### Core Engineering Principles (`Key Concepts`)
 
 - **Idempotency & Convergence**: Applying configuration `N` times yields the exact same state (`apply(apply(S)) == apply(S)`) with zero side effects
 - **Immutable Infrastructure (*Pets vs. Cattle*)**: Replace instances from golden images (**Packer** / containers) via `create_before_destroy` instead of patching in place

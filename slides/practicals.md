@@ -138,15 +138,15 @@ $ infracost diff --path=plan.json   # Monthly cost change: +$42.10 (+12%)
 
 ----
 
-### MSc Capstone Lab: Multi-AZ Cloud Architecture
+### Hands-on Lab: Multi-AZ Cloud Architecture
 
 - Build, test, and validate a modular AWS topology (using your **AWS Sandbox Account** or locally for free via **LocalStack** + `tflocal`):
 
-![MSc Terraform Lab Architecture](img/terraform-lab.svg)
+![Terraform Lab Architecture](img/terraform-lab.svg)
 
 ----
 
-### MSc Lab Requirements & Acceptance Criteria
+### Lab Requirements & Acceptance Criteria
 
 1. **State & Providers**: Configure `terraform >= 1.17.0`, `hashicorp/aws ~> 6.0`, and an S3 backend with `use_lockfile = true`
 2. **Dynamic Networking (`for_each`)**: Create a VPC (`10.0.0.0/16`) and 2 public subnets (`eu-central-1a`, `eu-central-1b`) via `for_each`
