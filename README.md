@@ -44,6 +44,8 @@ An interactive presentation on **Terraform, Infrastructure as Code (IaC), and Cl
 
 ```text
 .
+├── .github/workflows/
+│   └── export-pdf.yml  # GitHub Actions workflow exporting slides to PDF & GitHub Releases
 ├── index.html          # Reveal.js 6.0.2 entrypoint (jsDelivr CDN, zero-build setup)
 ├── css/
 │   └── custom.css      # Custom light theme, typography (Inter & JetBrains Mono), and responsive layout
@@ -72,14 +74,14 @@ npx serve .
 ```bash
 docker run --rm -p 8080:80 -v "$PWD":/usr/share/nginx/html:ro nginx:alpine
 ```
-Then open [http://localhost:8080](http://localhost:8080).
+Then open [http://localhost:8080](http://localhost:8000).
 
 ---
 
 ## Exporting to PDF
 
 ### Automated GitHub Release (Recommended)
-Every push to slide assets on `master` can publish **`terraform-in-a-nutshell.pdf`** both as a workflow artifact and as a versioned GitHub Release asset (`vYYYY.MM.DD-<run>`):
+Every push to slide assets on `master` triggers the [Export Slides to PDF & Release](.github/workflows/export-pdf.yml) GitHub Actions workflow using Playwright Chromium (`?print-pdf&pdfSeparateFragments=false`), publishing **`terraform-in-a-nutshell.pdf`** both as a workflow artifact and as a versioned GitHub Release asset (`vYYYY.MM.DD-<run>`):
 * **Direct Download:** [terraform-in-a-nutshell.pdf](https://github.com/devops-cloud-courses/terraform/releases/latest/download/terraform-in-a-nutshell.pdf)
 
 ### Manual Export via Chrome / Chromium
