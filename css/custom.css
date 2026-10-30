@@ -239,24 +239,96 @@
 /* Code Blocks (HCL, Bash, JSON) */
 .reveal pre {
   width: 100%;
-  margin: 0.45em 0 0.7em 0;
+  margin: 0.35em 0 0.45em 0;
   box-shadow: var(--shadow-md);
   border-radius: var(--radius-lg);
   border: 1px solid #1e293b;
   background: #0f172a;
   overflow: hidden;
-  font-size: 0.68em;
-  line-height: 1.5;
+  font-size: 0.64em;
+  line-height: 1.44;
 }
 
-.reveal pre code {
+.reveal pre code,
+.reveal pre code.hljs,
+.reveal .hljs {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  padding: 1.15em 1.4em !important;
-  max-height: 430px;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  white-space: pre !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+  padding: 0.95em 1.3em !important;
+  max-height: 490px !important;
   background: #0f172a !important;
-  color: #f8fafc;
+  color: #f8fafc !important;
   border-radius: var(--radius-lg);
   tab-size: 2;
+  overflow-x: auto;
+}
+
+/* High-contrast syntax highlighting on dark slate (#0f172a) */
+.reveal pre code .hljs-comment,
+.reveal pre code .hljs-quote {
+  color: #94a3b8 !important;
+  font-style: italic;
+}
+
+.reveal pre code .hljs-keyword,
+.reveal pre code .hljs-selector-tag,
+.reveal pre code .hljs-section {
+  color: #f472b6 !important;
+  font-weight: 600;
+}
+
+.reveal pre code .hljs-string,
+.reveal pre code .hljs-addition {
+  color: #86efac !important;
+}
+
+.reveal pre code .hljs-subst,
+.reveal pre code .hljs-variable,
+.reveal pre code .hljs-template-variable,
+.reveal pre code .hljs-attr,
+.reveal pre code .hljs-attribute {
+  color: #7dd3fc !important;
+}
+
+.reveal pre code .hljs-literal,
+.reveal pre code .hljs-number,
+.reveal pre code .hljs-type,
+.reveal pre code .hljs-built_in {
+  color: #c4b5fd !important;
+}
+
+.reveal pre code .hljs-title,
+.reveal pre code .hljs-name {
+  color: #fde047 !important;
+}
+
+/* Compact spacing on slides with code blocks so content never clips or scrolls */
+.reveal .slides section:has(pre) h3 {
+  margin-bottom: 0.45em;
+}
+
+.reveal .slides section:has(pre) > ul {
+  padding: 0.65em 1.25em 0.65em 1.85em;
+  margin-bottom: 0.4em;
+}
+
+.reveal .slides section:has(pre) > ul li {
+  font-size: 0.88em;
+  line-height: 1.4;
+  margin-bottom: 0.25em;
+}
+
+.reveal .slides section:has(pre + pre) pre {
+  margin: 0.28em 0;
+  font-size: 0.6em;
+}
+
+.reveal .slides section:has(pre + pre) pre code {
+  padding: 0.7em 1.15em !important;
 }
 
 .reveal kbd {
@@ -271,8 +343,21 @@
   box-shadow: 0 2px 0 #cbd5e1;
 }
 
-/* Modern Tables */
-.reveal table {
+/* Ensure highlight.js line-number tables inherit code block styling cleanly */
+.reveal pre table.hljs-ln,
+.reveal pre table.hljs-ln tbody,
+.reveal pre table.hljs-ln tr,
+.reveal pre table.hljs-ln td {
+  border: none !important;
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Modern Tables (exclude highlight.js line-number tables) */
+.reveal table:not(.hljs-ln) {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -285,7 +370,7 @@
   margin: 0.4em 0;
 }
 
-.reveal table thead th {
+.reveal table:not(.hljs-ln) thead th {
   background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
   color: #ffffff;
   font-weight: 700;
@@ -296,19 +381,19 @@
   border-bottom: none;
 }
 
-.reveal table tbody tr {
+.reveal table:not(.hljs-ln) tbody tr {
   transition: background-color 0.15s ease;
 }
 
-.reveal table tbody tr:nth-child(even) {
+.reveal table:not(.hljs-ln) tbody tr:nth-child(even) {
   background-color: #f8fafc;
 }
 
-.reveal table tbody tr:hover {
+.reveal table:not(.hljs-ln) tbody tr:hover {
   background-color: #eff6ff;
 }
 
-.reveal table tbody td {
+.reveal table:not(.hljs-ln) tbody td {
   padding: 0.75em 1.1em;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-secondary);
@@ -316,17 +401,17 @@
   line-height: 1.45;
 }
 
-.reveal table tbody tr:last-child td {
+.reveal table:not(.hljs-ln) tbody tr:last-child td {
   border-bottom: none;
 }
 
-.reveal table th:first-child,
-.reveal table td:first-child {
+.reveal table:not(.hljs-ln) th:first-child,
+.reveal table:not(.hljs-ln) td:first-child {
   text-align: left;
   width: 170px;
 }
 
-.reveal table tbody td:first-child {
+.reveal table:not(.hljs-ln) tbody td:first-child {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   color: var(--accent-primary);
@@ -334,30 +419,50 @@
 }
 
 /* Images & Diagrams */
+.reveal .slides section p:has(img) {
+  margin: 0;
+}
+
 .reveal .slides section img {
   display: block;
-  margin: 0.4em auto 0 auto;
-  max-height: 440px;
-  width: auto;
-  max-width: 92%;
+  margin: 0.25em auto 0 auto;
+  width: 100%;
+  max-width: 100%;
+  max-height: 540px;
+  height: auto;
   object-fit: contain;
   background: #ffffff;
-  padding: 14px;
+  padding: 8px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-md);
+  box-sizing: border-box;
 }
 
-/* Slides that combine a list and a diagram or code block */
-.reveal .slides section:has(img) > ul,
-.reveal .slides section:has(pre) > ul {
-  padding: 0.8em 1.3em 0.8em 2em;
-  margin-bottom: 0.45em;
+/* Slides that combine a list and a diagram */
+.reveal .slides section:has(img) h3 {
+  margin-bottom: 0.35em;
+  padding-bottom: 0.2em;
+}
+
+.reveal .slides section:has(img) > ul {
+  padding: 0.55em 1.2em 0.55em 1.8em;
+  margin-bottom: 0.35em;
+}
+
+.reveal .slides section:has(img) > ul li {
+  font-size: 0.85em;
+  line-height: 1.38;
+  margin-bottom: 0.2em;
+}
+
+.reveal .slides section:has(img) > ul li:last-child {
+  margin-bottom: 0;
 }
 
 .reveal .slides section:has(ul) img {
-  max-height: 290px;
-  padding: 10px;
+  max-height: 440px;
+  padding: 6px;
 }
 
 /* Title Slide & Hero Styling */

@@ -30,7 +30,7 @@
 
 ### Configuring Providers
 
-- Pin Terraform and provider versions in `versions.tf` (checksums are locked in `.terraform.lock.hcl`):
+- Pin Terraform and provider versions in `versions.tf` (checksums locked in `.terraform.lock.hcl`):
 
 ```hcl
 terraform {
@@ -53,7 +53,7 @@ provider "aws" {
 ### Provider Authentication
 
 - **Never commit static credentials** (`Access Keys`, `Secrets`, `Tokens`) in `.tf` files
-- Prefer **short-lived identity federation** (`OIDC` Workload Identity in GitHub Actions / GitLab CI, `AWS SSO` / `IAM Roles`) or environment variables:
+- Prefer **short-lived identity federation** (`OIDC` in GitHub Actions / GitLab CI, `AWS SSO` / `IAM Roles`) or environment variables:
 
 ```bash
 export AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY"
@@ -75,7 +75,7 @@ variable "s3_bucket_name" {
 
   validation {
     condition     = can(regex("^[a-z0-9-]+$", var.s3_bucket_name))
-    error_message = "Bucket name must contain only lowercase letters, numbers, and hyphens."
+    error_message = "Bucket name must be lowercase alphanumeric and hyphens."
   }
 }
 
@@ -217,7 +217,7 @@ module "lambda" {
 
 ### State (`terraform.tfstate`)
 
-- JSON snapshot mapping your declarative `.tf` resources to real-world provider IDs since the last `terraform apply`
+- JSON snapshot mapping declarative `.tf` resources to real-world cloud IDs since the last `terraform apply`
 - Stored locally by default (`terraform.tfstate`), but must be stored in a **Remote Backend** for teams
 
 ![Terraform State Architecture](img/terraform-state.svg)
@@ -267,17 +267,12 @@ resource "aws_db_instance" "postgres" {
 
 ### Workspaces
 
-- Manage multiple isolated state files (`dev`, `preprod`, `prod`) from the **same configuration directory**
+- Manage multiple isolated state files (`dev`, `preprod`, `prod`) from the **same configuration directory**:
 
 ```bash
-$ terraform workspace list            # List all existing workspaces
-$ terraform workspace new <name>      # Create and switch to a new workspace
-$ terraform workspace select <name>   # Switch to an existing workspace
-$ terraform workspace delete <name>   # Delete an empty workspace
-```
-
-```bash
-$ terraform workspace list
+$ terraform workspace new dev         # Create and switch to a new workspace
+$ terraform workspace select preprod  # Switch to an existing workspace
+$ terraform workspace list            # List workspaces (* indicates active)
   default
 * dev
   preprod
@@ -292,8 +287,8 @@ bucket = terraform.workspace == "preprod" ? var.bucket_demo_preprod : var.bucket
 
 ### Production State Architecture & Blast Radius
 
-- **Avoid CLI Workspaces alone for Production**: Sharing one backend and credential set across `dev` and `prod` creates a high **blast radius**
-- **Best Practice**: Isolate environments by **directory & cloud account** (`envs/dev/`, `envs/prod/`) and split monolithic state into **lifecycle layers**:
+- **Avoid CLI Workspaces alone in Prod**: Sharing one backend/credentials across `dev` and `prod` creates a high **blast radius**
+- **Best Practice**: Isolate environments by **directory & account** (`envs/dev/`, `envs/prod/`) and split state into **layers**:
 
 ![Terraform Layered State Architecture](img/terraform-layers.svg)
 

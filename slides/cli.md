@@ -78,11 +78,7 @@ $ terraform plan -minimal-refresh       # Only refresh resources with proposed c
 
 ### `terraform graph`
 
-- Outputs a visual dependency graph (in Graphviz `DOT` format) showing how Terraform orders parallel resource operations in its **DAG**:
-
-```bash
-$ terraform graph | dot -Tsvg > graph.svg
-```
+- Visualizes the **Directed Acyclic Graph (`DAG`)** to show parallel resource creation order (`$ terraform graph | dot -Tsvg > graph.svg`):
 
 ![Terraform Dependency Graph](img/terraform-graph.svg)
 
@@ -112,13 +108,9 @@ $ echo "aws_iam_user.lgu.arn" | terraform console
 ### `terraform destroy`
 
 - Destroys **all** remote objects managed by the current Terraform configuration and state
+- Preview a destruction plan safely beforehand with `-destroy`:
 
 ```bash
-$ terraform destroy
-```
-
-- Preview or save a destruction plan beforehand:
-
-```bash
-$ terraform plan -destroy
+$ terraform plan -destroy   # Preview destruction plan without deleting resources
+$ terraform destroy         # Destroy all managed infrastructure
 ```

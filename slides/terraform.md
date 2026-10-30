@@ -4,9 +4,8 @@
 
 ### What is Terraform?
 
-- Created in **2014** by **HashiCorp (an IBM Company)** and written in **Go**
-- Industry-standard declarative **Infrastructure as Code (`IaC`)** tool
-- Enables teams to safely **build**, **change**, **test**, and **version** infrastructure across any cloud
+- Created in **2014** by **HashiCorp (an IBM Company)** in **Go** — the de facto standard for **Infrastructure as Code (`IaC`)**
+- Enables teams to safely **build**, **change**, **test**, and **version** infrastructure across any cloud or SaaS API
 
 ![Terraform Overview](img/terraform-overview.svg)
 
