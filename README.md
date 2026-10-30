@@ -10,7 +10,7 @@ An interactive presentation on **Terraform, Infrastructure as Code (IaC), and Cl
 
 ## Course Curriculum
 
-1. **Introduction & Engineering Principles** (`slides/introduction.md`)
+1. **Infrastructure as Code (IaC) & Engineering Principles** (`slides/iac.md`)
    * The evolution of infrastructure management (`ClickOps` → `Imperative Scripts` → `Config Management` → `Declarative IaC`)
    * **Idempotency & Convergence** (`apply(apply(S)) == apply(S)`) and **Immutable Infrastructure** (*Pets vs. Cattle*)
    * **Separation of Concerns** across `Terraform`, `Packer` / `Docker`, and `Kubernetes` / `Helm` / `ArgoCD`
