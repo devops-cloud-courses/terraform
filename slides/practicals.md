@@ -11,12 +11,7 @@
 $ brew tap hashicorp/tap
 $ brew install hashicorp/tap/terraform
 
-# Or direct Linux binary (v1.17.0)
-$ curl -fsSLO https://releases.hashicorp.com/terraform/1.17.0/terraform_1.17.0_linux_amd64.zip
-$ sudo unzip terraform_1.17.0_linux_amd64.zip -d /usr/local/bin
-```
-
-```bash
+# Verify installed version
 $ terraform --version
 Terraform v1.17.0
 on darwin_arm64

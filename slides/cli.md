@@ -69,9 +69,9 @@ Success! 1 passed, 0 failed.
 - Save the plan to a binary file, detect drift, or speed up large states with `-minimal-refresh`:
 
 ```bash
-$ terraform plan -out=plan.out          # Save exact plan for apply
-$ terraform plan -refresh-only          # Detect drift without changing resources
-$ terraform plan -minimal-refresh       # Only refresh resources with proposed changes (v1.17+)
+$ terraform plan -out=plan.out     # Save exact plan for apply
+$ terraform plan -refresh-only     # Detect drift without changing resources
+$ terraform plan -minimal-refresh  # Refresh only modified resources (v1.17+)
 ```
 
 ----

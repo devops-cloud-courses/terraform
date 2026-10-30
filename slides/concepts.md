@@ -237,10 +237,10 @@ terraform {
 
 ### Ephemeral Values & Secrets (`Terraform 1.10+`)
 
-- Standard resource attributes are saved in `terraform.tfstate` — use **`ephemeral` resources** and **write-only arguments (`_wo`)** so secrets are **never stored** in state or plan files:
+- Use **`ephemeral` resources** and **write-only arguments (`_wo`)** so secrets are **never stored** in `terraform.tfstate` or plan files:
 
 ```hcl
-ephemeral "aws_secretsmanager_secret_version" "db_password" {
+ephemeral "aws_secretsmanager_secret_version" "db" {
   secret_id = "prod/rds/master-password"
 }
 
@@ -249,7 +249,7 @@ resource "aws_db_instance" "postgres" {
   engine              = "postgres"
   instance_class      = "db.t4g.micro"
   username            = "dbadmin"
-  password_wo         = ephemeral.aws_secretsmanager_secret_version.db_password.secret_string
+  password_wo         = ephemeral.aws_secretsmanager_secret_version.db.secret_string
   password_wo_version = 1
 }
 ```
